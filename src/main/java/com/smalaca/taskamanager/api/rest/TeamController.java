@@ -74,7 +74,7 @@ public class TeamController {
         }
 
         Team team = found.get();
-        TeamDto dto = new TeamDto(team);
+        TeamDto dto = team.asTeamDto();
 
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }

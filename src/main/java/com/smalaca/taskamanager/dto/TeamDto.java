@@ -1,7 +1,5 @@
 package com.smalaca.taskamanager.dto;
 
-import com.smalaca.taskamanager.model.entities.Team;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,24 +10,6 @@ public class TeamDto {
     private String codenameFull;
     private String description;
     private List<Long> userIds = new ArrayList<>();
-
-    @Deprecated
-    public TeamDto() {
-
-    }
-
-    public TeamDto(Team team) {
-        this.setId(team.getId());
-        this.setName(team.getName());
-
-        if (team.getCodename() != null) {
-            this.setCodenameShort(team.getCodename().getShortName());
-            this.setCodenameFull(team.getCodename().getFullName());
-        }
-
-        this.setDescription(team.getDescription());
-        this.setUserIds(team.getUserIds());
-    }
 
     public Long getId() {
         return id;
