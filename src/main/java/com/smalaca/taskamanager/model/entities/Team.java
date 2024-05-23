@@ -126,7 +126,7 @@ public class Team {
         dto.setId(id);
         dto.setName(name);
 
-        if (getCodename() != null) {
+        if (hasCodename()) {
             dto.setCodenameShort(codename.getShortName());
             dto.setCodenameFull(codename.getFullName());
         }
@@ -134,6 +134,10 @@ public class Team {
         dto.setDescription(description);
         dto.setUserIds(getUserIds());
         return dto;
+    }
+
+    private boolean hasCodename() {
+        return codename != null;
     }
 
     private List<Long> getUserIds() {
