@@ -21,11 +21,11 @@ import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.DONE;
 
 @Component
 public class ToDoItemProcessor {
-    private final StoryService storyService;
-    private final EventsRegistry eventsRegistry;
-    private final ProjectBacklogService projectBacklogService;
-    private final CommunicationService communicationService;
-    private final SprintBacklogService sprintBacklogService;
+    private StoryService storyService;
+    private EventsRegistry eventsRegistry;
+    private ProjectBacklogService projectBacklogService;
+    private CommunicationService communicationService;
+    private SprintBacklogService sprintBacklogService;
 
     public ToDoItemProcessor(
             StoryService storyService, EventsRegistry eventsRegistry, ProjectBacklogService projectBacklogService,
@@ -82,15 +82,29 @@ public class ToDoItemProcessor {
                 if (toDoItem instanceof Epic) {
                     Epic epic = (Epic) toDoItem;
                     projectBacklogService.putOnTop(epic);
-                    EpicReadyToPrioritize event = new EpicReadyToPrioritize();
-                    event.setEpicId(epic.getId());
-                    eventsRegistry.publish(event);
+                    publishEpicReadyToPrioritizeEventFor(epic);
                     communicationService.notify(toDoItem, toDoItem.getProject().getProductOwner());
                 } else {
                     throw new UnsupportedToDoItemType();
                 }
             }
         }
+    }
+
+    @Deprecated
+    void publishEpicReadyToPrioritizeEventFor(Epic epic) {
+        EpicReadyToPrioritize event = new EpicReadyToPrioritize();
+        event.setEpicId(epic.getId());
+        eventsRegistry.publish(event);
+//        validateEpic();
+//        Foo foo = eventsRegistry.publish(event);
+//        foo.doSomething();
+//        storyService.doSomething(foo);
+    }
+
+    @Deprecated
+    void setEventsRegistry(EventsRegistry eventsRegistry) {
+        this.eventsRegistry = eventsRegistry;
     }
 
     private void processInProgress(ToDoItem toDoItem) {
