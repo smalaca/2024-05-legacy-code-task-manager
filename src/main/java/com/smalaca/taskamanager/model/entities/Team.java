@@ -133,6 +133,22 @@ public class Team {
 
         dto.setDescription(description);
         dto.setUserIds(getUserIds());
+
+//        TeamDto dto = new TeamDto(this);
+//
+//        TeamDto dto = new TeamDto(...);
+//
+//        TeamDto dto = TeamDto.create(...);
+//
+//        TeamDto dto = new TeamDtoFactory().create(
+//                id, name, codename.getShortName(), codename.getFullName(), description, getUserIds());
+//
+//        TeamDto dto = new TeamDtoBuilder()
+//                .withId(id)
+//                .withName(name)
+//                .with()
+//                .build();
+
         return dto;
     }
 
