@@ -74,17 +74,7 @@ public class TeamController {
         }
 
         Team team = found.get();
-        TeamDto dto = new TeamDto();
-        dto.setId(team.getId());
-        dto.setName(team.getName());
-
-        if (team.getCodename() != null) {
-            dto.setCodenameShort(team.getCodename().getShortName());
-            dto.setCodenameFull(team.getCodename().getFullName());
-        }
-
-        dto.setDescription(team.getDescription());
-        dto.setUserIds(team.getUserIds());
+        TeamDto dto = new TeamDto(team);
 
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
