@@ -13,6 +13,8 @@ import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 @Entity
 public class Team {
     @Id
@@ -116,5 +118,9 @@ public class Team {
                 .append(codename)
                 .append(description)
                 .toHashCode();
+    }
+
+    public List<Long> getUserIds() {
+        return members.stream().map(User::getId).collect(toList());
     }
 }
