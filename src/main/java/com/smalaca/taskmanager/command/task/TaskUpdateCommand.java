@@ -5,6 +5,8 @@ import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 import com.smalaca.taskamanager.repository.TaskRepository;
 
+import java.util.Optional;
+
 import static com.smalaca.taskmanager.command.task.OwnerDomainModel.Builder.owner;
 
 class TaskUpdateCommand {
@@ -17,13 +19,13 @@ class TaskUpdateCommand {
     }
 
     UpdateStatus process(long id, TaskDto dto) {
-        Task task;
+        Optional<Task> found = taskRepository.findById(id);
 
-        if (taskRepository.existsById(id)) {
-            task = taskRepository.findById(id).get();
-        } else {
+        if (found.isEmpty()) {
             return UpdateStatus.TASK_NOT_FOUND;
         }
+
+        Task task = found.get();
 
         if (dto.getDescription() != null) {
             task.setDescription(dto.getDescription());
