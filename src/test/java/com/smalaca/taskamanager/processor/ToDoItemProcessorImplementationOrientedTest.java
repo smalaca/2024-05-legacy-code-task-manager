@@ -58,12 +58,12 @@ class ToDoItemProcessorImplementationOrientedTest {
         inOrder.verify(epic).getStatus();
         inOrder.verify(projectBacklogService).putOnTop((Epic) epic);
         inOrder.verify(epic).getId();
+
         ArgumentCaptor<EpicReadyToPrioritize> captor = ArgumentCaptor.forClass(EpicReadyToPrioritize.class);
-//        then(eventsRegistry).should().publish(any(EpicReadyToPrioritize.class));
         inOrder.verify(eventsRegistry).publish(captor.capture());
         EpicReadyToPrioritize event = captor.getValue();
-//        assertThat(event.getEpicId()).isEqualTo(epicId);
         assertThat(event).extracting("epicId").isEqualTo(epicId);
+
         inOrder.verify(epic).getProject();
         inOrder.verify(project).getProductOwner();
         inOrder.verify(communicationService).notify(epic, productOwner);
