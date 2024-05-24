@@ -65,9 +65,9 @@ class TaskUpdateCommand {
 
                 if (userExists) {
                     UserDomainModel user = taskUpdateAntiCorruptionLayer.findById(dto.getOwnerId());
-                    Owner owner = user.convertToOwner();
+                    OwnerDomainModel ownerDomainModel = user.convertToOwner();
 
-                    task.setOwner(owner);
+                    task.setOwner(ownerDomainModel.toOwner());
                 } else {
                     return UpdateStatus.USER_NOT_FOUND;
                 }
