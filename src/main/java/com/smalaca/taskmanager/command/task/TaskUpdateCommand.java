@@ -2,7 +2,6 @@ package com.smalaca.taskmanager.command.task;
 
 import com.smalaca.taskamanager.dto.TaskDto;
 import com.smalaca.taskamanager.model.entities.Task;
-import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 import com.smalaca.taskamanager.repository.TaskRepository;
 
 import java.util.Optional;
@@ -38,11 +37,8 @@ class TaskUpdateCommand {
             taskDomainModel.changeDescription(command.getDescription());
         }
 
-        if (command.hasStatus()) {
-            if (ToDoItemStatus.valueOf(dto.getStatus()) != task.getStatus()) {
-                task.setStatus(command.getStatus());
-                taskUpdateAntiCorruptionLayer.processTask(taskDomainModel.getId());
-            }
+        if (taskDomainModel.changeStatusIfNeeded(command)) {
+            taskUpdateAntiCorruptionLayer.processTask(taskDomainModel.getId());
         }
 
         if (task.getOwner() != null) {

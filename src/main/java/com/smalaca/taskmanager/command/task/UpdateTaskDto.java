@@ -1,7 +1,5 @@
 package com.smalaca.taskmanager.command.task;
 
-import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
-
 class UpdateTaskDto {
     private final long id;
     private final String status;
@@ -29,7 +27,7 @@ class UpdateTaskDto {
         return status != null;
     }
 
-    ToDoItemStatus getStatus() {
-        return ToDoItemStatus.valueOf(status);
+    String getStatus() {
+        return status;
     }
 }
