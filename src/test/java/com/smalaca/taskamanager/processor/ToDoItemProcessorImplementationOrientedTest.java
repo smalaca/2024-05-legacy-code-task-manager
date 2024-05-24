@@ -11,11 +11,13 @@ import com.smalaca.taskamanager.service.ProjectBacklogService;
 import com.smalaca.taskamanager.service.SprintBacklogService;
 import com.smalaca.taskamanager.service.StoryService;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.DEFINED;
-import static org.mockito.ArgumentMatchers.any;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -34,8 +36,10 @@ class ToDoItemProcessorImplementationOrientedTest {
                 projectBacklogService,
                 communicationService,
                 sprintBacklogService);
+        long epicId = 123;
         ToDoItem epic = mock(Epic.class);
         given(epic.getStatus()).willReturn(DEFINED);
+        given(epic.getId()).willReturn(epicId);
         Project project = mock(Project.class);
         given(epic.getProject()).willReturn(project);
         ProductOwner productOwner = mock(ProductOwner.class);
@@ -48,7 +52,12 @@ class ToDoItemProcessorImplementationOrientedTest {
         then(epic).should().getProject();
         then(project).should().getProductOwner();
         then(projectBacklogService).should().putOnTop((Epic) epic);
-        then(eventsRegistry).should().publish(any(EpicReadyToPrioritize.class));
+        ArgumentCaptor<EpicReadyToPrioritize> captor = ArgumentCaptor.forClass(EpicReadyToPrioritize.class);
+//        then(eventsRegistry).should().publish(any(EpicReadyToPrioritize.class));
+        then(eventsRegistry).should().publish(captor.capture());
+        EpicReadyToPrioritize event = captor.getValue();
+//        assertThat(event.getEpicId()).isEqualTo(epicId);
+        assertThat(event).extracting("epicId").isEqualTo(epicId);
         then(communicationService).should().notify(epic, productOwner);
         verifyNoMoreInteractions(
                 storyService,
