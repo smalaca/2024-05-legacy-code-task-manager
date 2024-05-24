@@ -106,6 +106,43 @@ class ToDoItemProcessorImplementationOrientedTest {
     }
 
     @Test
+    void shouldProcessToDoItemDefinedWhenToDoItemIsStoryAndTasksAreNotEmptyAndIsNotAssigned() {
+        Project project = mock(Project.class);
+        Story story = mock(Story.class);
+
+        given(story.getStatus()).willReturn(DEFINED);
+        given(story.getTasks()).willReturn(ImmutableList.of(mock(Task.class)));
+        given(story.isAssigned()).willReturn(false);
+        given(story.getProject()).willReturn(project);
+
+        toDoItemProcessor.processFor(story);
+
+        InOrder inOrder = inOrder(
+                storyService,
+                eventsRegistry,
+                projectBacklogService,
+                communicationService,
+                sprintBacklogService,
+                story);
+
+        inOrder.verify(story).getStatus();
+        inOrder.verify(story).getTasks();
+        inOrder.verify(story).isAssigned();
+        inOrder.verify(story).getProject();
+        inOrder.verify(communicationService).notifyTeamsAbout(story,project);
+
+
+        verifyNoMoreInteractions(
+                storyService,
+                eventsRegistry,
+                projectBacklogService,
+                communicationService,
+                sprintBacklogService,
+
+                story);
+    }
+
+    @Test
     void shouldProcessToDoItemDefinedWhenToDoItemIsEpic() {
 //        EventsRegistry.isTest();
         long epicId = 123;
