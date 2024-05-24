@@ -23,19 +23,17 @@ import org.springframework.http.ResponseEntity;
 import java.util.Optional;
 
 public class TaskCommandApi {
-
-    private ToDoItemService toDoItemService;
-
-    public TaskCommandApi(ToDoItemService toDoItemService, UserRepository userRepository, StoryRepository storyRepository, TaskRepository taskRepository) {
-        this.toDoItemService = toDoItemService;
-        this.userRepository = userRepository;
-        this.storyRepository = storyRepository;
-        this.taskRepository = taskRepository;
-    }
-
     private UserRepository userRepository;
     private StoryRepository storyRepository;
     private TaskRepository taskRepository;
+    private TaskUpdateCommand taskUpdateCommand;
+
+    public TaskCommandApi(ToDoItemService toDoItemService, UserRepository userRepository, StoryRepository storyRepository, TaskRepository taskRepository) {
+        this.userRepository = userRepository;
+        this.storyRepository = storyRepository;
+        this.taskRepository = taskRepository;
+        this.taskUpdateCommand = new TaskUpdateCommand(toDoItemService, taskRepository, userRepository);
+    }
 
     public ResponseEntity<Long> create(TaskDto dto) {
         Task t = new Task();
@@ -94,82 +92,7 @@ public class TaskCommandApi {
     }
 
     public UpdateStatus update(long id, TaskDto dto) {
-        Task task;
-
-        try {
-            task = findById(id);
-        } catch (TaskDoesNotExistException exception) {
-            return UpdateStatus.TASK_NOT_FOUND;
-        }
-
-        if (dto.getDescription() != null) {
-            task.setDescription(dto.getDescription());
-        }
-
-        boolean service = false;
-        if (dto.getStatus() != null) {
-            if (ToDoItemStatus.valueOf(dto.getStatus()) != task.getStatus()) {
-                service = true;
-                task.setStatus(ToDoItemStatus.valueOf(dto.getStatus()));
-            }
-        }
-
-        if (task.getOwner() != null) {
-            Owner o = new Owner();
-            o.setFirstName(task.getOwner().getFirstName());
-            o.setLastName(task.getOwner().getLastName());
-
-            if (dto.getOwnerPhoneNumberPrefix() != null && dto.getOwnerPhoneNumberNumber() != null) {
-                PhoneNumber pno = new PhoneNumber();
-                pno.setNumber(dto.getOwnerPhoneNumberNumber());
-                pno.setPrefix(dto.getOwnerPhoneNumberPrefix());
-                o.setPhoneNumber(pno);
-            }
-
-            if (dto.getOwnerEmailAddress() != null) {
-                EmailAddress email = new EmailAddress();
-                email.setEmailAddress(dto.getOwnerEmailAddress());
-                o.setEmailAddress(email);
-            }
-
-            task.setOwner(o);
-
-        } else {
-            if (dto.getOwnerId() != null) {
-                boolean userExists = userRepository.existsById(dto.getOwnerId());
-
-                if (userExists) {
-                    User user = userRepository.findById(dto.getOwnerId()).get();
-                    Owner ownr = new Owner();
-
-                    if (user.getPhoneNumber() != null) {
-                        PhoneNumber number = new PhoneNumber();
-                        number.setNumber(user.getPhoneNumber().getNumber());
-                        number.setPrefix(user.getPhoneNumber().getPrefix());
-                        ownr.setPhoneNumber(number);
-                    }
-
-                    ownr.setLastName(user.getUserName().getLastName());
-                    ownr.setFirstName(user.getUserName().getFirstName());
-
-                    if (user.getEmailAddress() != null) {
-                        EmailAddress eAdd = new EmailAddress();
-                        eAdd.setEmailAddress(user.getEmailAddress().getEmailAddress());
-                        ownr.setEmailAddress(eAdd);
-                    }
-
-                    task.setOwner(ownr);
-                } else {
-                    return UpdateStatus.USER_NOT_FOUND;
-                }
-            }
-        }
-        taskRepository.save(task);
-        if (service) {
-            toDoItemService.processTask(task.getId());
-        }
-
-        return UpdateStatus.SUCCESS;
+        return taskUpdateCommand.process(id, dto);
     }
 
     public ResponseEntity<Void> delete(long id) {
@@ -222,14 +145,6 @@ public class TaskCommandApi {
         } catch (TaskDoesNotExistException exception) {
             return ResponseEntity.notFound().build();
         }
-    }
-
-    private Task findById(long id) {
-        if (taskRepository.existsById(id)) {
-            return taskRepository.findById(id).get();
-        }
-
-        throw new TaskDoesNotExistException();
     }
 
     private Task findTaskBy(long id) {
