@@ -4,6 +4,7 @@ import com.smalaca.taskamanager.events.EpicReadyToPrioritize;
 import com.smalaca.taskamanager.model.entities.Epic;
 import com.smalaca.taskamanager.model.entities.ProductOwner;
 import com.smalaca.taskamanager.model.entities.Project;
+import com.smalaca.taskamanager.model.entities.Story;
 import com.smalaca.taskamanager.model.interfaces.ToDoItem;
 import com.smalaca.taskamanager.registry.EventsRegistry;
 import com.smalaca.taskamanager.service.CommunicationService;
@@ -24,8 +25,55 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 class ToDoItemProcessorImplementationOrientedTest {
 
     @Test
+    void shouldProcessToDoItemDefinedWhenToDoItemIsStoryAndTasksAreEmpty() {
+        StoryService storyService = mock(StoryService.class);
+        EventsRegistry eventsRegistry = mock(EventsRegistry.class);
+        ProjectBacklogService projectBacklogService = mock(ProjectBacklogService.class);
+        CommunicationService communicationService = mock(CommunicationService.class);
+        SprintBacklogService sprintBacklogService = mock(SprintBacklogService.class);
+        Project project = mock(Project.class);
+
+        ToDoItemProcessor toDoItemProcessor = new ToDoItemProcessor(
+                storyService,
+                eventsRegistry,
+                projectBacklogService,
+                communicationService,
+                sprintBacklogService);
+
+        Story story = mock(Story.class);
+
+        given(story.getStatus()).willReturn(DEFINED);
+        given(story.getProject()).willReturn(project);
+
+        toDoItemProcessor.processFor(story);
+
+        InOrder inOrder = inOrder(
+                storyService,
+                eventsRegistry,
+                projectBacklogService,
+                communicationService,
+                sprintBacklogService,
+                story);
+
+        inOrder.verify(story).getStatus();
+        inOrder.verify(story).getTasks();
+        inOrder.verify(story).getProject();
+        inOrder.verify(projectBacklogService).moveToReadyForDevelopment(story,project);
+
+
+        verifyNoMoreInteractions(
+                storyService,
+                eventsRegistry,
+                projectBacklogService,
+                communicationService,
+                sprintBacklogService,
+
+                story);
+    }
+
+    @Test
     void shouldProcessToDoItemDefinedWhenToDoItemIsEpic() {
-        EventsRegistry.isTest();
+//        EventsRegistry.isTest();
         StoryService storyService = mock(StoryService.class);
         EventsRegistry eventsRegistry = mock(EventsRegistry.class);
         ProjectBacklogService projectBacklogService = mock(ProjectBacklogService.class);
