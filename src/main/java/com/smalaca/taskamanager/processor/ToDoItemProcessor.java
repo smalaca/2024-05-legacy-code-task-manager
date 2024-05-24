@@ -96,6 +96,7 @@ public class ToDoItemProcessor {
         EpicReadyToPrioritize event = new EpicReadyToPrioritize();
         event.setEpicId(epic.getId());
         eventsRegistry.publish(event);
+//        EventsRegistry.publishStatic(event);
 //        validateEpic();
 //        Foo foo = eventsRegistry.publish(event);
 //        foo.doSomething();

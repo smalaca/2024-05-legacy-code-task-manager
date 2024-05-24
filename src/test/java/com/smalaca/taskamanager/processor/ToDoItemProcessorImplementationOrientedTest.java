@@ -25,6 +25,7 @@ class ToDoItemProcessorImplementationOrientedTest {
 
     @Test
     void shouldProcessToDoItemDefinedWhenToDoItemIsEpic() {
+        EventsRegistry.isTest();
         StoryService storyService = mock(StoryService.class);
         EventsRegistry eventsRegistry = mock(EventsRegistry.class);
         ProjectBacklogService projectBacklogService = mock(ProjectBacklogService.class);
