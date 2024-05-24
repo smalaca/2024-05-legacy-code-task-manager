@@ -12,4 +12,8 @@ class TaskDomainModel {
     Task asTask() {
         return task;
     }
+
+    Long getId() {
+        return task.getId();
+    }
 }

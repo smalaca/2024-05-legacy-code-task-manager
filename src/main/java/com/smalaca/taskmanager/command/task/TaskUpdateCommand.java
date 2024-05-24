@@ -34,11 +34,10 @@ class TaskUpdateCommand {
             task.setDescription(dto.getDescription());
         }
 
-        boolean service = false;
         if (dto.getStatus() != null) {
             if (ToDoItemStatus.valueOf(dto.getStatus()) != task.getStatus()) {
-                service = true;
                 task.setStatus(ToDoItemStatus.valueOf(dto.getStatus()));
+                taskUpdateAntiCorruptionLayer.processTask(taskDomainModel.getId());
             }
         }
 
@@ -70,10 +69,6 @@ class TaskUpdateCommand {
             }
         }
         taskRepository.save(taskDomainModel.asTask());
-
-        if (service) {
-            taskUpdateAntiCorruptionLayer.processTask(task.getId());
-        }
 
         return UpdateStatus.SUCCESS;
     }
