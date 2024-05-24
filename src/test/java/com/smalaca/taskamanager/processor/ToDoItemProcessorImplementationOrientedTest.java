@@ -12,11 +12,11 @@ import com.smalaca.taskamanager.service.SprintBacklogService;
 import com.smalaca.taskamanager.service.StoryService;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 
 import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.DEFINED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -47,18 +47,26 @@ class ToDoItemProcessorImplementationOrientedTest {
 
         toDoItemProcessor.processFor(epic);
 
-        then(epic).should().getStatus();
-        then(epic).should().getId();
-        then(epic).should().getProject();
-        then(project).should().getProductOwner();
-        then(projectBacklogService).should().putOnTop((Epic) epic);
+        InOrder inOrder = inOrder(
+                storyService,
+                eventsRegistry,
+                projectBacklogService,
+                communicationService,
+                sprintBacklogService,
+                epic, project, productOwner);
+
+        inOrder.verify(epic).getStatus();
+        inOrder.verify(projectBacklogService).putOnTop((Epic) epic);
+        inOrder.verify(epic).getId();
         ArgumentCaptor<EpicReadyToPrioritize> captor = ArgumentCaptor.forClass(EpicReadyToPrioritize.class);
 //        then(eventsRegistry).should().publish(any(EpicReadyToPrioritize.class));
-        then(eventsRegistry).should().publish(captor.capture());
+        inOrder.verify(eventsRegistry).publish(captor.capture());
         EpicReadyToPrioritize event = captor.getValue();
 //        assertThat(event.getEpicId()).isEqualTo(epicId);
         assertThat(event).extracting("epicId").isEqualTo(epicId);
-        then(communicationService).should().notify(epic, productOwner);
+        inOrder.verify(epic).getProject();
+        inOrder.verify(project).getProductOwner();
+        inOrder.verify(communicationService).notify(epic, productOwner);
         verifyNoMoreInteractions(
                 storyService,
                 eventsRegistry,
