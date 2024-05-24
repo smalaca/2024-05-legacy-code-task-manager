@@ -59,7 +59,7 @@ class TaskUpdateCommand {
                 Optional<UserDomainModel> found = taskUpdateAntiCorruptionLayer.findUserById(dto.getOwnerId());
 
                 if (found.isPresent()) {
-                    UserDomainModel user = taskUpdateAntiCorruptionLayer.findById(dto.getOwnerId());
+                    UserDomainModel user = found.get();
                     OwnerDomainModel ownerDomainModel = user.convertToOwner();
 
                     task.setOwner(ownerDomainModel.toOwner());

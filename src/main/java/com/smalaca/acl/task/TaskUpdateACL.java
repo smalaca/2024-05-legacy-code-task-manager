@@ -23,22 +23,8 @@ public class TaskUpdateACL implements TaskUpdateAntiCorruptionLayer {
     }
 
     @Override
-    public boolean existsById(Long ownerId) {
-        return userRepository.existsById(ownerId);
-    }
-
-    @Override
-    public UserDomainModel findById(Long ownerId) {
-        User user = userRepository.findById(ownerId).get();
-        return new UserDomainModel(user);
-    }
-
-    @Override
     public Optional<UserDomainModel> findUserById(Long userId) {
-        if (existsById(userId)) {
-            return Optional.of(findById(userId));
-        } else {
-            return Optional.empty();
-        }
+        Optional<User> found = userRepository.findById(userId);
+        return found.map(UserDomainModel::new);
     }
 }
