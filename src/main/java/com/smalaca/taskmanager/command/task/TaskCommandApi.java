@@ -176,4 +176,20 @@ public class TaskCommandApi {
 
         return ResponseEntity.ok().build();
     }
+
+    public ResponseEntity<Void> delete(long id) {
+        try {
+            Optional<Task> found = taskRepository.findById(id);
+
+            if (found.isEmpty()) {
+                throw new TaskDoesNotExistException();
+            }
+
+            taskRepository.delete(found.get());
+
+            return ResponseEntity.ok().build();
+        } catch (TaskDoesNotExistException exception) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

@@ -83,19 +83,7 @@ public class TaskController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable long id) {
-        try {
-            Optional<Task> found = taskRepository.findById(id);
-
-            if (found.isEmpty()) {
-                throw new TaskDoesNotExistException();
-            }
-
-            taskRepository.delete(found.get());
-
-            return ResponseEntity.ok().build();
-        } catch (TaskDoesNotExistException exception) {
-            return ResponseEntity.notFound().build();
-        }
+        return taskCommandApi.delete(id);
     }
 
     @PutMapping("/{id}/watcher")
