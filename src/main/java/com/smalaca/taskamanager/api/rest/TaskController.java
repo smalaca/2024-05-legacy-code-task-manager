@@ -25,6 +25,7 @@ import com.smalaca.taskamanager.repository.TaskRepository;
 import com.smalaca.taskamanager.repository.TeamRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
 import com.smalaca.taskamanager.service.ToDoItemService;
+import com.smalaca.taskmanager.query.task.TaskQueryApi;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,9 +38,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/task")
@@ -50,6 +49,7 @@ public class TaskController {
     private final TeamRepository teamRepository;
     private final StoryRepository storyRepository;
     private final ToDoItemService toDoItemService;
+    private final TaskQueryApi taskQueryApi;
 
     public TaskController(
             TaskRepository taskRepository, UserRepository userRepository, TeamRepository teamRepository,
@@ -59,89 +59,13 @@ public class TaskController {
         this.teamRepository = teamRepository;
         this.storyRepository = storyRepository;
         this.toDoItemService = toDoItemService;
+        taskQueryApi = new TaskQueryApi(taskRepository);
     }
 
     @Transactional
     @GetMapping("/{id}")
     public ResponseEntity<TaskDto> findById(@PathVariable Long id) {
-        Optional<Task> found = taskRepository.findById(id);
-
-        if (found.isPresent()) {
-            Task task = found.get();
-            TaskDto dto = new TaskDto();
-
-            dto.setId(task.getId());
-            dto.setDescription(task.getDescription());
-            dto.setTitle(task.getTitle());
-            dto.setStatus(task.getStatus().name());
-
-            if (task.getStory() != null) {
-                Story project = task.getStory();
-                dto.setStoryId(project.getId());
-            }
-
-            Owner owner = task.getOwner();
-
-            if (owner != null) {
-                dto.setOwnerLastName(owner.getLastName());
-                dto.setOwnerFirstName(owner.getFirstName());
-
-                PhoneNumber phoneNumber = owner.getPhoneNumber();
-
-                if (phoneNumber != null) {
-                    dto.setOwnerPhoneNumberNumber(phoneNumber.getNumber());
-                    dto.setOwnerPhoneNumberPrefix(phoneNumber.getPrefix());
-                }
-
-                EmailAddress emailAddress = owner.getEmailAddress();
-
-                if (emailAddress != null) {
-                    dto.setOwnerEmailAddress(emailAddress.getEmailAddress());
-                }
-            }
-
-            List<WatcherDto> watchers = task.getWatchers().stream().map(watcher -> {
-                WatcherDto wDto = new WatcherDto();
-                wDto.setLastName(watcher.getLastName());
-                wDto.setFirstName(watcher.getFirstName());
-                if (watcher.getEmailAddress() != null) {
-                    wDto.setEmailAddress(watcher.getEmailAddress().getEmailAddress());
-                }
-                if (watcher.getPhoneNumber() != null) {
-                    wDto.setPhoneNumber(watcher.getPhoneNumber().getNumber());
-                    wDto.setPhonePrefix(watcher.getPhoneNumber().getPrefix());
-                }
-                return wDto;
-            }).collect(Collectors.toList());
-            dto.setWatchers(watchers);
-            
-            if (task.getAssignee() != null) {
-                AssigneeDto aDto = new AssigneeDto();
-                aDto.setTeamId(task.getAssignee().getTeamId());
-                aDto.setLastName(task.getAssignee().getLastName());
-                aDto.setFirstName(task.getAssignee().getFirstName());
-                dto.setAssignee(aDto);
-            }
-
-            List<StakeholderDto> stakeholders = task.getStakeholders().stream().map(stakeholder -> {
-                StakeholderDto sDto = new StakeholderDto();
-                sDto.setLastName(stakeholder.getLastName());
-                sDto.setFirstName(stakeholder.getFirstName());
-                if (stakeholder.getEmailAddress() != null) {
-                    sDto.setEmailAddress(stakeholder.getEmailAddress().getEmailAddress());
-                }
-                if (stakeholder.getPhoneNumber() != null) {
-                    sDto.setPhoneNumber(stakeholder.getPhoneNumber().getNumber());
-                    sDto.setPhonePrefix(stakeholder.getPhoneNumber().getPrefix());
-                }
-                return sDto;
-            }).collect(Collectors.toList());
-            dto.setStakeholders(stakeholders);
-
-            return ResponseEntity.ok(dto);
-        }
-
-        return ResponseEntity.notFound().build();
+        return taskQueryApi.findById(id);
     }
 
     @PostMapping
