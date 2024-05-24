@@ -10,14 +10,12 @@ import com.smalaca.taskamanager.exception.TeamNotFoundException;
 import com.smalaca.taskamanager.exception.UserNotFoundException;
 import com.smalaca.taskamanager.model.embedded.Assignee;
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
-import com.smalaca.taskamanager.model.embedded.Owner;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
 import com.smalaca.taskamanager.model.embedded.Stakeholder;
 import com.smalaca.taskamanager.model.embedded.Watcher;
 import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.model.entities.Team;
 import com.smalaca.taskamanager.model.entities.User;
-import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 import com.smalaca.taskamanager.repository.StoryRepository;
 import com.smalaca.taskamanager.repository.TaskRepository;
 import com.smalaca.taskamanager.repository.TeamRepository;
@@ -46,8 +44,6 @@ public class TaskController {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
-    private final StoryRepository storyRepository;
-    private final ToDoItemService toDoItemService;
     private final TaskQueryApi taskQueryApi;
     private final TaskCommandApi taskCommandApi;
 
@@ -57,10 +53,8 @@ public class TaskController {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
-        this.storyRepository = storyRepository;
-        this.toDoItemService = toDoItemService;
         taskQueryApi = new TaskQueryApi(taskRepository);
-        taskCommandApi = new TaskCommandApi(userRepository, storyRepository, taskRepository);
+        taskCommandApi = new TaskCommandApi(toDoItemService, userRepository, storyRepository, taskRepository);
     }
 
     @Transactional
@@ -76,82 +70,7 @@ public class TaskController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(@PathVariable long id, @RequestBody TaskDto dto) {
-        Task task;
-
-        try {
-            task = findById(id);
-        } catch (TaskDoesNotExistException exception) {
-            return ResponseEntity.notFound().build();
-        }
-
-        if (dto.getDescription() != null) {
-            task.setDescription(dto.getDescription());
-        }
-
-        boolean service = false;
-        if (dto.getStatus() != null) {
-            if (ToDoItemStatus.valueOf(dto.getStatus()) != task.getStatus()) {
-                service = true;
-                task.setStatus(ToDoItemStatus.valueOf(dto.getStatus()));
-            }
-        }
-
-        if (task.getOwner() != null) {
-            Owner o = new Owner();
-            o.setFirstName(task.getOwner().getFirstName());
-            o.setLastName(task.getOwner().getLastName());
-
-            if (dto.getOwnerPhoneNumberPrefix() != null && dto.getOwnerPhoneNumberNumber() != null) {
-                PhoneNumber pno = new PhoneNumber();
-                pno.setNumber(dto.getOwnerPhoneNumberNumber());
-                pno.setPrefix(dto.getOwnerPhoneNumberPrefix());
-                o.setPhoneNumber(pno);
-            }
-
-            if (dto.getOwnerEmailAddress() != null) {
-                EmailAddress email = new EmailAddress();
-                email.setEmailAddress(dto.getOwnerEmailAddress());
-                o.setEmailAddress(email);
-            }
-
-            task.setOwner(o);
-
-        } else {
-            if (dto.getOwnerId() != null) {
-                boolean userExists = userRepository.existsById(dto.getOwnerId());
-
-                if (userExists) {
-                    User user = userRepository.findById(dto.getOwnerId()).get();
-                    Owner ownr = new Owner();
-
-                    if (user.getPhoneNumber() != null) {
-                        PhoneNumber number = new PhoneNumber();
-                        number.setNumber(user.getPhoneNumber().getNumber());
-                        number.setPrefix(user.getPhoneNumber().getPrefix());
-                        ownr.setPhoneNumber(number);
-                    }
-
-                    ownr.setLastName(user.getUserName().getLastName());
-                    ownr.setFirstName(user.getUserName().getFirstName());
-
-                    if (user.getEmailAddress() != null) {
-                        EmailAddress eAdd = new EmailAddress();
-                        eAdd.setEmailAddress(user.getEmailAddress().getEmailAddress());
-                        ownr.setEmailAddress(eAdd);
-                    }
-
-                    task.setOwner(ownr);
-                } else {
-                    return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
-                }
-            }
-        }
-        taskRepository.save(task);
-        if (service) {
-            toDoItemService.processTask(task.getId());
-        }
-
-        return ResponseEntity.ok().build();
+        return taskCommandApi.update(id, dto);
     }
 
     private Task findById(long id) {
