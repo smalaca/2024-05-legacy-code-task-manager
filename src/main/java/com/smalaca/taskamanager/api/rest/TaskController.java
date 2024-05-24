@@ -88,39 +88,7 @@ public class TaskController {
 
     @PutMapping("/{id}/watcher")
     public ResponseEntity<Void> addWatcher(@PathVariable long id, @RequestBody WatcherDto dto) {
-        try {
-            Task entity1 = findTaskBy(id);
-
-            try {
-                User entity2 = findUserBy(dto.getId());
-                Watcher entity3 = new Watcher();
-                entity3.setFirstName(entity2.getUserName().getFirstName());
-                entity3.setLastName(entity2.getUserName().getLastName());
-
-                if (entity2.getEmailAddress() != null) {
-                    EmailAddress entity4 = new EmailAddress();
-                    entity4.setEmailAddress(entity2.getEmailAddress().getEmailAddress());
-                    entity3.setEmailAddress(entity4);
-                }
-
-                if (entity2.getPhoneNumber() != null) {
-                    PhoneNumber entity5 = new PhoneNumber();
-                    entity5.setNumber(entity2.getPhoneNumber().getNumber());
-                    entity5.setPrefix(entity2.getPhoneNumber().getPrefix());
-                    entity3.setPhoneNumber(entity5);
-                }
-                entity1.addWatcher(entity3);
-
-                taskRepository.save(entity1);
-
-            } catch (UserNotFoundException exception) {
-                return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
-            }
-
-            return ResponseEntity.ok().build();
-        } catch (TaskDoesNotExistException exception) {
-            return ResponseEntity.notFound().build();
-        }
+        return taskCommandApi.addWatcher(id, dto);
     }
 
     @DeleteMapping("/{taskId}/watcher/{watcherId}")
