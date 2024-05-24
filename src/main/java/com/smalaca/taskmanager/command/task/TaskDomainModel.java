@@ -16,4 +16,8 @@ class TaskDomainModel {
     Long getId() {
         return task.getId();
     }
+
+    void changeDescription(String description) {
+        task.setDescription(description);
+    }
 }

@@ -19,7 +19,10 @@ class TaskUpdateCommand {
     }
 
     UpdateStatus process(long id, TaskDto dto) {
-        UpdateTaskDto command = new UpdateTaskDto(id, dto.getDescription());
+        UpdateTaskDto command = new UpdateTaskDto(
+                id,
+                dto.getStatus(),
+                dto.getDescription());
         Optional<Task> found = taskRepository.findById(command.getId());
 
         if (found.isEmpty()) {
@@ -32,12 +35,12 @@ class TaskUpdateCommand {
     private UpdateStatus update(Task task, TaskDto dto, UpdateTaskDto command) {
         TaskDomainModel taskDomainModel = new TaskDomainModel(task);
         if (command.hasDescription()) {
-            task.setDescription(command.getDescription());
+            taskDomainModel.changeDescription(command.getDescription());
         }
 
-        if (dto.getStatus() != null) {
+        if (command.hasStatus()) {
             if (ToDoItemStatus.valueOf(dto.getStatus()) != task.getStatus()) {
-                task.setStatus(ToDoItemStatus.valueOf(dto.getStatus()));
+                task.setStatus(command.getStatus());
                 taskUpdateAntiCorruptionLayer.processTask(taskDomainModel.getId());
             }
         }
