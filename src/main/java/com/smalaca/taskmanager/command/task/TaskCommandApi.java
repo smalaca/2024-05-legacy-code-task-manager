@@ -16,7 +16,6 @@ import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 import com.smalaca.taskamanager.repository.StoryRepository;
 import com.smalaca.taskamanager.repository.TaskRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
-import com.smalaca.taskamanager.service.ToDoItemService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -28,11 +27,11 @@ public class TaskCommandApi {
     private TaskRepository taskRepository;
     private TaskUpdateCommand taskUpdateCommand;
 
-    public TaskCommandApi(ToDoItemService toDoItemService, UserRepository userRepository, StoryRepository storyRepository, TaskRepository taskRepository) {
+    public TaskCommandApi(UserRepository userRepository, StoryRepository storyRepository, TaskRepository taskRepository, TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer) {
         this.userRepository = userRepository;
         this.storyRepository = storyRepository;
         this.taskRepository = taskRepository;
-        this.taskUpdateCommand = new TaskUpdateCommand(toDoItemService, taskRepository, userRepository);
+        this.taskUpdateCommand = new TaskUpdateCommand(taskRepository, userRepository, taskUpdateAntiCorruptionLayer);
     }
 
     public ResponseEntity<Long> create(TaskDto dto) {

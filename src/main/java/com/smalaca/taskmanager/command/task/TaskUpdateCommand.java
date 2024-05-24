@@ -10,17 +10,16 @@ import com.smalaca.taskamanager.model.entities.User;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 import com.smalaca.taskamanager.repository.TaskRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
-import com.smalaca.taskamanager.service.ToDoItemService;
 
 class TaskUpdateCommand {
-    private final ToDoItemService toDoItemService;
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer;
 
-    TaskUpdateCommand(ToDoItemService toDoItemService, TaskRepository taskRepository, UserRepository userRepository) {
-        this.toDoItemService = toDoItemService;
+    TaskUpdateCommand(TaskRepository taskRepository, UserRepository userRepository, TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
+        this.taskUpdateAntiCorruptionLayer = taskUpdateAntiCorruptionLayer;
     }
 
     UpdateStatus process(long id, TaskDto dto) {
@@ -96,7 +95,7 @@ class TaskUpdateCommand {
         }
         taskRepository.save(task);
         if (service) {
-            toDoItemService.processTask(task.getId());
+            taskUpdateAntiCorruptionLayer.processTask(task.getId());
         }
 
         return UpdateStatus.SUCCESS;
