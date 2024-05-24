@@ -5,7 +5,6 @@ import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.repository.TaskRepository;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 import static com.smalaca.taskmanager.command.task.OwnerDomainModel.Builder.owner;
 
@@ -57,16 +56,8 @@ class TaskUpdateCommand {
 
         } else {
             if (dto.getOwnerId() != null) {
-                Function<Long, Optional<UserDomainModel>> foundUserFunction = (userId) -> {
-                    boolean userExists = taskUpdateAntiCorruptionLayer.existsById(userId);
-                    if (userExists) {
-                        return Optional.of(taskUpdateAntiCorruptionLayer.findById(dto.getOwnerId()));
-                    } else {
-                        return Optional.empty();
-                    }
-                };
+                Optional<UserDomainModel> found = taskUpdateAntiCorruptionLayer.findUserById(dto.getOwnerId());
 
-                Optional<UserDomainModel> found = foundUserFunction.apply(dto.getOwnerId());
                 if (found.isPresent()) {
                     UserDomainModel user = taskUpdateAntiCorruptionLayer.findById(dto.getOwnerId());
                     OwnerDomainModel ownerDomainModel = user.convertToOwner();
