@@ -56,7 +56,7 @@ public class TaskController {
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
         taskQueryApi = new TaskQueryApi(taskRepository);
-        taskCommandApi = new TaskCommandApi(userRepository, storyRepository, taskRepository, new TaskUpdateACL(toDoItemService));
+        taskCommandApi = new TaskCommandApi(userRepository, storyRepository, taskRepository, new TaskUpdateACL(toDoItemService, userRepository));
     }
 
     @Transactional

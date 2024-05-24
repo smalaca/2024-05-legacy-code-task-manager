@@ -9,16 +9,13 @@ import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.model.entities.User;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 import com.smalaca.taskamanager.repository.TaskRepository;
-import com.smalaca.taskamanager.repository.UserRepository;
 
 class TaskUpdateCommand {
     private final TaskRepository taskRepository;
-    private final UserRepository userRepository;
     private final TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer;
 
-    TaskUpdateCommand(TaskRepository taskRepository, UserRepository userRepository, TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer) {
+    TaskUpdateCommand(TaskRepository taskRepository, TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer) {
         this.taskRepository = taskRepository;
-        this.userRepository = userRepository;
         this.taskUpdateAntiCorruptionLayer = taskUpdateAntiCorruptionLayer;
     }
 
@@ -65,10 +62,10 @@ class TaskUpdateCommand {
 
         } else {
             if (dto.getOwnerId() != null) {
-                boolean userExists = userRepository.existsById(dto.getOwnerId());
+                boolean userExists = taskUpdateAntiCorruptionLayer.existsById(dto.getOwnerId());
 
                 if (userExists) {
-                    User user = userRepository.findById(dto.getOwnerId()).get();
+                    User user = taskUpdateAntiCorruptionLayer.findById(dto.getOwnerId()).get();
                     Owner ownr = new Owner();
 
                     if (user.getPhoneNumber() != null) {
