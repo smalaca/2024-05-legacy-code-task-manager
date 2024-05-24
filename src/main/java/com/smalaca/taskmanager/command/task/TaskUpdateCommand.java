@@ -13,9 +13,9 @@ import com.smalaca.taskamanager.repository.UserRepository;
 import com.smalaca.taskamanager.service.ToDoItemService;
 
 class TaskUpdateCommand {
-    private ToDoItemService toDoItemService;
-    private TaskRepository taskRepository;
-    private UserRepository userRepository;
+    private final ToDoItemService toDoItemService;
+    private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
 
     TaskUpdateCommand(ToDoItemService toDoItemService, TaskRepository taskRepository, UserRepository userRepository) {
         this.toDoItemService = toDoItemService;
