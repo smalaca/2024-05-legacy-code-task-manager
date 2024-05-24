@@ -1,6 +1,5 @@
 package com.smalaca.taskamanager.processor;
 
-import com.smalaca.taskamanager.events.EpicReadyToPrioritize;
 import com.smalaca.taskamanager.exception.UnsupportedToDoItemType;
 import com.smalaca.taskamanager.model.entities.Epic;
 import com.smalaca.taskamanager.model.entities.Story;
@@ -26,40 +25,13 @@ class ToDoItemDefinedProcessor {
 
     void extracted(ToDoItem toDoItem) {
         if (toDoItem instanceof Story) {
-            Story story = (Story) toDoItem;
-            if (story.getTasks().isEmpty()) {
-                projectBacklogService.moveToReadyForDevelopment(story, story.getProject());
-            } else {
-                if (!story.isAssigned()) {
-                    communicationService.notifyTeamsAbout(story, story.getProject());
-                }
-            }
+            new StoryDefined(projectBacklogService, communicationService).process((Story) toDoItem);
+        } else if (toDoItem instanceof Task) {
+            new TaskDefined(sprintBacklogService).process((Task) toDoItem);
+        } else if (toDoItem instanceof Epic) {
+            new EpicDefined(projectBacklogService, eventsRegistry, communicationService).process((Epic) toDoItem);
         } else {
-            if (toDoItem instanceof Task) {
-                Task task = (Task) toDoItem;
-                sprintBacklogService.moveToReadyForDevelopment(task, task.getCurrentSprint());
-            } else {
-                if (toDoItem instanceof Epic) {
-                    Epic epic = (Epic) toDoItem;
-                    projectBacklogService.putOnTop(epic);
-                    publishEpicReadyToPrioritizeEventFor(epic);
-                    communicationService.notify(toDoItem, toDoItem.getProject().getProductOwner());
-                } else {
-                    throw new UnsupportedToDoItemType();
-                }
-            }
+            throw new UnsupportedToDoItemType();
         }
-    }
-
-    @Deprecated
-    void publishEpicReadyToPrioritizeEventFor(Epic epic) {
-        EpicReadyToPrioritize event = new EpicReadyToPrioritize();
-        event.setEpicId(epic.getId());
-        eventsRegistry.publish(event);
-//        EventsRegistry.publishStatic(event);
-//        validateEpic();
-//        Foo foo = eventsRegistry.publish(event);
-//        foo.doSomething();
-//        storyService.doSomething(foo);
     }
 }
