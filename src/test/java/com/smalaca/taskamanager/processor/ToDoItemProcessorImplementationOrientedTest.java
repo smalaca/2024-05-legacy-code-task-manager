@@ -5,6 +5,7 @@ import com.smalaca.taskamanager.events.EpicReadyToPrioritize;
 import com.smalaca.taskamanager.model.entities.Epic;
 import com.smalaca.taskamanager.model.entities.ProductOwner;
 import com.smalaca.taskamanager.model.entities.Project;
+import com.smalaca.taskamanager.model.entities.Sprint;
 import com.smalaca.taskamanager.model.entities.Story;
 import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.model.interfaces.ToDoItem;
@@ -70,6 +71,39 @@ class ToDoItemProcessorImplementationOrientedTest {
                 sprintBacklogService,
 
                 story, project);
+    }
+
+    @Test
+    void shouldProcessToDoItemDefinedWhenToDoItemIsTask() {
+        Task task = mock(Task.class);
+        Sprint sprint = mock(Sprint.class);
+
+        given(task.getStatus()).willReturn(DEFINED);
+        given(task.getCurrentSprint()).willReturn(sprint);
+
+        toDoItemProcessor.processFor(task);
+
+        InOrder inOrder = inOrder(
+                storyService,
+                eventsRegistry,
+                projectBacklogService,
+                communicationService,
+                sprintBacklogService,
+                task, sprint);
+
+        inOrder.verify(task).getStatus();
+        inOrder.verify(task).getCurrentSprint();
+        inOrder.verify(sprintBacklogService).moveToReadyForDevelopment(task,sprint);
+
+
+        verifyNoMoreInteractions(
+                storyService,
+                eventsRegistry,
+                projectBacklogService,
+                communicationService,
+                sprintBacklogService,
+
+                task, sprint);
     }
 
     @Test
