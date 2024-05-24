@@ -1,12 +1,9 @@
 package com.smalaca.taskamanager.processor;
 
-import com.smalaca.taskamanager.events.EpicReadyToPrioritize;
 import com.smalaca.taskamanager.events.StoryApprovedEvent;
 import com.smalaca.taskamanager.events.StoryDoneEvent;
 import com.smalaca.taskamanager.events.TaskApprovedEvent;
 import com.smalaca.taskamanager.events.ToDoItemReleasedEvent;
-import com.smalaca.taskamanager.exception.UnsupportedToDoItemType;
-import com.smalaca.taskamanager.model.entities.Epic;
 import com.smalaca.taskamanager.model.entities.Story;
 import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.model.interfaces.ToDoItem;
@@ -26,6 +23,7 @@ public class ToDoItemProcessor {
     private ProjectBacklogService projectBacklogService;
     private CommunicationService communicationService;
     private SprintBacklogService sprintBacklogService;
+    private final ToDoItemDefinedProcessor toDoItemDefinedProcessor;
 
     public ToDoItemProcessor(
             StoryService storyService, EventsRegistry eventsRegistry, ProjectBacklogService projectBacklogService,
@@ -35,12 +33,14 @@ public class ToDoItemProcessor {
         this.projectBacklogService = projectBacklogService;
         this.communicationService = communicationService;
         this.sprintBacklogService = sprintBacklogService;
+        toDoItemDefinedProcessor = new ToDoItemDefinedProcessor(
+                projectBacklogService, communicationService, sprintBacklogService, eventsRegistry);
     }
 
     public void processFor(ToDoItem toDoItem) {
         switch (toDoItem.getStatus()) {
             case DEFINED:
-                processDefined(toDoItem);
+                toDoItemDefinedProcessor.extracted(toDoItem);
                 break;
 
             case IN_PROGRESS:
@@ -62,45 +62,6 @@ public class ToDoItemProcessor {
             default:
                 break;
         }
-    }
-
-    private void processDefined(ToDoItem toDoItem) {
-        if (toDoItem instanceof Story) {
-            Story story = (Story) toDoItem;
-            if (story.getTasks().isEmpty()) {
-                projectBacklogService.moveToReadyForDevelopment(story, story.getProject());
-            } else {
-                if (!story.isAssigned()) {
-                    communicationService.notifyTeamsAbout(story, story.getProject());
-                }
-            }
-        } else {
-            if (toDoItem instanceof Task) {
-                Task task = (Task) toDoItem;
-                sprintBacklogService.moveToReadyForDevelopment(task, task.getCurrentSprint());
-            } else {
-                if (toDoItem instanceof Epic) {
-                    Epic epic = (Epic) toDoItem;
-                    projectBacklogService.putOnTop(epic);
-                    publishEpicReadyToPrioritizeEventFor(epic);
-                    communicationService.notify(toDoItem, toDoItem.getProject().getProductOwner());
-                } else {
-                    throw new UnsupportedToDoItemType();
-                }
-            }
-        }
-    }
-
-    @Deprecated
-    void publishEpicReadyToPrioritizeEventFor(Epic epic) {
-        EpicReadyToPrioritize event = new EpicReadyToPrioritize();
-        event.setEpicId(epic.getId());
-        eventsRegistry.publish(event);
-//        EventsRegistry.publishStatic(event);
-//        validateEpic();
-//        Foo foo = eventsRegistry.publish(event);
-//        foo.doSomething();
-//        storyService.doSomething(foo);
     }
 
     @Deprecated
