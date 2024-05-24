@@ -2,6 +2,7 @@ package com.smalaca.taskamanager.processor;
 
 import com.google.common.collect.ImmutableList;
 import com.smalaca.taskamanager.events.EpicReadyToPrioritize;
+import com.smalaca.taskamanager.exception.UnsupportedToDoItemType;
 import com.smalaca.taskamanager.model.entities.Epic;
 import com.smalaca.taskamanager.model.entities.ProductOwner;
 import com.smalaca.taskamanager.model.entities.Project;
@@ -20,6 +21,7 @@ import org.mockito.InOrder;
 
 import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.DEFINED;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -104,6 +106,35 @@ class ToDoItemProcessorImplementationOrientedTest {
                 sprintBacklogService,
 
                 task, sprint);
+    }
+
+    @Test
+    void shouldProcessToDoItemDefinedWhenToDoItemIsFake() {
+        FakeToDoItem fakeToDoItem = mock(FakeToDoItem.class);
+
+        given(fakeToDoItem.getStatus()).willReturn(DEFINED);
+
+        assertThrows(UnsupportedToDoItemType.class, () -> toDoItemProcessor.processFor(fakeToDoItem));
+
+        InOrder inOrder = inOrder(
+                storyService,
+                eventsRegistry,
+                projectBacklogService,
+                communicationService,
+                sprintBacklogService,
+                fakeToDoItem);
+
+        inOrder.verify(fakeToDoItem).getStatus();
+
+
+        verifyNoMoreInteractions(
+                storyService,
+                eventsRegistry,
+                projectBacklogService,
+                communicationService,
+                sprintBacklogService,
+
+                fakeToDoItem);
     }
 
     @Test
