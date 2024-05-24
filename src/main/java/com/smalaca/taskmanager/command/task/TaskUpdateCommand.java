@@ -19,19 +19,20 @@ class TaskUpdateCommand {
     }
 
     UpdateStatus process(long id, TaskDto dto) {
-        Optional<Task> found = taskRepository.findById(id);
+        UpdateTaskDto command = new UpdateTaskDto(id, dto.getDescription());
+        Optional<Task> found = taskRepository.findById(command.getId());
 
         if (found.isEmpty()) {
             return UpdateStatus.TASK_NOT_FOUND;
         } else {
-            return update(found.get(), dto);
+            return update(found.get(), dto, command);
         }
     }
 
-    private UpdateStatus update(Task task, TaskDto dto) {
+    private UpdateStatus update(Task task, TaskDto dto, UpdateTaskDto command) {
         TaskDomainModel taskDomainModel = new TaskDomainModel(task);
-        if (dto.getDescription() != null) {
-            task.setDescription(dto.getDescription());
+        if (command.hasDescription()) {
+            task.setDescription(command.getDescription());
         }
 
         if (dto.getStatus() != null) {
