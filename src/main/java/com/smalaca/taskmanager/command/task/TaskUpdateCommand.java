@@ -29,6 +29,7 @@ class TaskUpdateCommand {
     }
 
     private UpdateStatus update(Task task, TaskDto dto) {
+        TaskDomainModel taskDomainModel = new TaskDomainModel(task);
         if (dto.getDescription() != null) {
             task.setDescription(dto.getDescription());
         }
@@ -68,7 +69,8 @@ class TaskUpdateCommand {
                 }
             }
         }
-        taskRepository.save(task);
+        taskRepository.save(taskDomainModel.asTask());
+
         if (service) {
             taskUpdateAntiCorruptionLayer.processTask(task.getId());
         }
