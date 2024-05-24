@@ -5,7 +5,6 @@ import com.smalaca.taskamanager.dto.AssigneeDto;
 import com.smalaca.taskamanager.dto.StakeholderDto;
 import com.smalaca.taskamanager.dto.TaskDto;
 import com.smalaca.taskamanager.dto.WatcherDto;
-import com.smalaca.taskamanager.exception.ProjectNotFoundException;
 import com.smalaca.taskamanager.exception.TaskDoesNotExistException;
 import com.smalaca.taskamanager.exception.TeamNotFoundException;
 import com.smalaca.taskamanager.exception.UserNotFoundException;
@@ -15,7 +14,6 @@ import com.smalaca.taskamanager.model.embedded.Owner;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
 import com.smalaca.taskamanager.model.embedded.Stakeholder;
 import com.smalaca.taskamanager.model.embedded.Watcher;
-import com.smalaca.taskamanager.model.entities.Story;
 import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.model.entities.Team;
 import com.smalaca.taskamanager.model.entities.User;
@@ -25,6 +23,7 @@ import com.smalaca.taskamanager.repository.TaskRepository;
 import com.smalaca.taskamanager.repository.TeamRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
 import com.smalaca.taskamanager.service.ToDoItemService;
+import com.smalaca.taskmanager.command.task.TaskCommandApi;
 import com.smalaca.taskmanager.query.task.TaskQueryApi;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,6 +49,7 @@ public class TaskController {
     private final StoryRepository storyRepository;
     private final ToDoItemService toDoItemService;
     private final TaskQueryApi taskQueryApi;
+    private final TaskCommandApi taskCommandApi;
 
     public TaskController(
             TaskRepository taskRepository, UserRepository userRepository, TeamRepository teamRepository,
@@ -60,6 +60,7 @@ public class TaskController {
         this.storyRepository = storyRepository;
         this.toDoItemService = toDoItemService;
         taskQueryApi = new TaskQueryApi(taskRepository);
+        taskCommandApi = new TaskCommandApi(userRepository, storyRepository, taskRepository);
     }
 
     @Transactional
@@ -70,59 +71,7 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<Long> create(@RequestBody TaskDto dto) {
-        Task t = new Task();
-        t.setTitle(dto.getTitle());
-        t.setDescription(dto.getDescription());
-        t.setStatus(ToDoItemStatus.valueOf(dto.getStatus()));
-
-        if (dto.getOwnerId() != null) {
-            Optional<User> found = userRepository.findById(dto.getOwnerId());
-
-            if (found.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
-            } else {
-                User u = found.get();
-                Owner o = new Owner();
-                o.setLastName(u.getUserName().getLastName());
-                o.setFirstName(u.getUserName().getFirstName());
-
-                if (u.getEmailAddress() != null) {
-                    EmailAddress ea = new EmailAddress();
-                    ea.setEmailAddress(u.getEmailAddress().getEmailAddress());
-                    o.setEmailAddress(ea);
-                }
-
-                if (u.getPhoneNumber() != null) {
-                    PhoneNumber pn = new PhoneNumber();
-                    pn.setNumber(u.getPhoneNumber().getNumber());
-                    pn.setPrefix(u.getPhoneNumber().getPrefix());
-                    o.setPhoneNumber(pn);
-                }
-
-                t.setOwner(o);
-            }
-        }
-
-        if (dto.getStoryId() != null) {
-            Story str;
-            try {
-                if (!storyRepository.existsById(dto.getStoryId())) {
-                    throw new ProjectNotFoundException();
-                }
-
-                str = storyRepository.findById(dto.getStoryId()).get();
-            } catch (ProjectNotFoundException exception) {
-                return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
-            }
-
-            t.setStory(str);
-            str.addTask(t);
-            storyRepository.save(str);
-        }
-
-        Task saved = taskRepository.save(t);
-
-        return ResponseEntity.ok(saved.getId());
+        return taskCommandApi.create(dto);
     }
 
     @PutMapping("/{id}")
