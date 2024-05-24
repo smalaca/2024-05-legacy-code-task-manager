@@ -23,10 +23,12 @@ class TaskUpdateCommand {
 
         if (found.isEmpty()) {
             return UpdateStatus.TASK_NOT_FOUND;
+        } else {
+            return update(found.get(), dto);
         }
+    }
 
-        Task task = found.get();
-
+    private UpdateStatus update(Task task, TaskDto dto) {
         if (dto.getDescription() != null) {
             task.setDescription(dto.getDescription());
         }
