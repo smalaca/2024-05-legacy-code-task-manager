@@ -1,10 +1,12 @@
 package com.smalaca.taskamanager.processor;
 
+import com.google.common.collect.ImmutableList;
 import com.smalaca.taskamanager.events.EpicReadyToPrioritize;
 import com.smalaca.taskamanager.model.entities.Epic;
 import com.smalaca.taskamanager.model.entities.ProductOwner;
 import com.smalaca.taskamanager.model.entities.Project;
 import com.smalaca.taskamanager.model.entities.Story;
+import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.model.interfaces.ToDoItem;
 import com.smalaca.taskamanager.registry.EventsRegistry;
 import com.smalaca.taskamanager.service.CommunicationService;
@@ -24,22 +26,21 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 class ToDoItemProcessorImplementationOrientedTest {
 
+    private final StoryService storyService = mock(StoryService.class);
+    private final EventsRegistry eventsRegistry = mock(EventsRegistry.class);
+    private final ProjectBacklogService projectBacklogService = mock(ProjectBacklogService.class);
+    private final CommunicationService communicationService = mock(CommunicationService.class);
+    private final SprintBacklogService sprintBacklogService = mock(SprintBacklogService.class);
+    private final ToDoItemProcessor toDoItemProcessor = new ToDoItemProcessor(
+            storyService,
+            eventsRegistry,
+            projectBacklogService,
+            communicationService,
+            sprintBacklogService);
+
     @Test
     void shouldProcessToDoItemDefinedWhenToDoItemIsStoryAndTasksAreEmpty() {
-        StoryService storyService = mock(StoryService.class);
-        EventsRegistry eventsRegistry = mock(EventsRegistry.class);
-        ProjectBacklogService projectBacklogService = mock(ProjectBacklogService.class);
-        CommunicationService communicationService = mock(CommunicationService.class);
-        SprintBacklogService sprintBacklogService = mock(SprintBacklogService.class);
         Project project = mock(Project.class);
-
-        ToDoItemProcessor toDoItemProcessor = new ToDoItemProcessor(
-                storyService,
-                eventsRegistry,
-                projectBacklogService,
-                communicationService,
-                sprintBacklogService);
-
         Story story = mock(Story.class);
 
         given(story.getStatus()).willReturn(DEFINED);
@@ -72,19 +73,41 @@ class ToDoItemProcessorImplementationOrientedTest {
     }
 
     @Test
-    void shouldProcessToDoItemDefinedWhenToDoItemIsEpic() {
-//        EventsRegistry.isTest();
-        StoryService storyService = mock(StoryService.class);
-        EventsRegistry eventsRegistry = mock(EventsRegistry.class);
-        ProjectBacklogService projectBacklogService = mock(ProjectBacklogService.class);
-        CommunicationService communicationService = mock(CommunicationService.class);
-        SprintBacklogService sprintBacklogService = mock(SprintBacklogService.class);
-        ToDoItemProcessor toDoItemProcessor = new ToDoItemProcessor(
+    void shouldProcessToDoItemDefinedWhenToDoItemIsStoryAndTasksAreNotEmptyAndIsAssigned() {
+        Story story = mock(Story.class);
+
+        given(story.getStatus()).willReturn(DEFINED);
+        given(story.getTasks()).willReturn(ImmutableList.of(mock(Task.class)));
+        given(story.isAssigned()).willReturn(true);
+
+        toDoItemProcessor.processFor(story);
+
+        InOrder inOrder = inOrder(
                 storyService,
                 eventsRegistry,
                 projectBacklogService,
                 communicationService,
-                sprintBacklogService);
+                sprintBacklogService,
+                story);
+
+        inOrder.verify(story).getStatus();
+        inOrder.verify(story).getTasks();
+        inOrder.verify(story).isAssigned();
+
+
+        verifyNoMoreInteractions(
+                storyService,
+                eventsRegistry,
+                projectBacklogService,
+                communicationService,
+                sprintBacklogService,
+
+                story);
+    }
+
+    @Test
+    void shouldProcessToDoItemDefinedWhenToDoItemIsEpic() {
+//        EventsRegistry.isTest();
         long epicId = 123;
         ToDoItem epic = mock(Epic.class);
         given(epic.getStatus()).willReturn(DEFINED);
