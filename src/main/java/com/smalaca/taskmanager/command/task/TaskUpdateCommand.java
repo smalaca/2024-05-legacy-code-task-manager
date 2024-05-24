@@ -1,7 +1,6 @@
 package com.smalaca.taskmanager.command.task;
 
 import com.smalaca.taskamanager.dto.TaskDto;
-import com.smalaca.taskamanager.exception.TaskDoesNotExistException;
 import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 import com.smalaca.taskamanager.repository.TaskRepository;
@@ -20,9 +19,9 @@ class TaskUpdateCommand {
     UpdateStatus process(long id, TaskDto dto) {
         Task task;
 
-        try {
-            task = findById(id);
-        } catch (TaskDoesNotExistException exception) {
+        if (taskRepository.existsById(id)) {
+            task = taskRepository.findById(id).get();
+        } else {
             return UpdateStatus.TASK_NOT_FOUND;
         }
 
@@ -71,13 +70,5 @@ class TaskUpdateCommand {
         }
 
         return UpdateStatus.SUCCESS;
-    }
-
-    private Task findById(long id) {
-        if (taskRepository.existsById(id)) {
-            return taskRepository.findById(id).get();
-        }
-
-        throw new TaskDoesNotExistException();
     }
 }
