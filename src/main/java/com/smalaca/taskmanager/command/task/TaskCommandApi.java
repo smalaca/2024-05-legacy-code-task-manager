@@ -93,13 +93,13 @@ public class TaskCommandApi {
         return ResponseEntity.ok(saved.getId());
     }
 
-    public ResponseEntity<Void> update(long id, TaskDto dto) {
+    public UpdateStatus update(long id, TaskDto dto) {
         Task task;
 
         try {
             task = findById(id);
         } catch (TaskDoesNotExistException exception) {
-            return ResponseEntity.notFound().build();
+            return UpdateStatus.TASK_NOT_FOUND;
         }
 
         if (dto.getDescription() != null) {
@@ -160,7 +160,7 @@ public class TaskCommandApi {
 
                     task.setOwner(ownr);
                 } else {
-                    return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+                    return UpdateStatus.USER_NOT_FOUND;
                 }
             }
         }
@@ -169,7 +169,7 @@ public class TaskCommandApi {
             toDoItemService.processTask(task.getId());
         }
 
-        return ResponseEntity.ok().build();
+        return UpdateStatus.SUCCESS;
     }
 
     public ResponseEntity<Void> delete(long id) {

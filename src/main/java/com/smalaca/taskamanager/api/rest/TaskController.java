@@ -22,6 +22,7 @@ import com.smalaca.taskamanager.repository.TeamRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
 import com.smalaca.taskamanager.service.ToDoItemService;
 import com.smalaca.taskmanager.command.task.TaskCommandApi;
+import com.smalaca.taskmanager.command.task.UpdateStatus;
 import com.smalaca.taskmanager.query.task.TaskQueryApi;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -70,7 +71,18 @@ public class TaskController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(@PathVariable long id, @RequestBody TaskDto dto) {
-        return taskCommandApi.update(id, dto);
+        UpdateStatus status = taskCommandApi.update(id, dto);
+
+        switch (status) {
+            case TASK_NOT_FOUND:
+                return ResponseEntity.notFound().build();
+            case USER_NOT_FOUND:
+                return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+            case SUCCESS:
+                return ResponseEntity.ok().build();
+            default:
+                throw new RuntimeException("Not supported Task update status.");
+        }
     }
 
     private Task findById(long id) {
