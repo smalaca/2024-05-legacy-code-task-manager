@@ -2,12 +2,11 @@ package com.smalaca.taskmanager.command.task;
 
 import com.smalaca.taskamanager.dto.TaskDto;
 import com.smalaca.taskamanager.exception.TaskDoesNotExistException;
-import com.smalaca.taskamanager.model.embedded.EmailAddress;
-import com.smalaca.taskamanager.model.embedded.Owner;
-import com.smalaca.taskamanager.model.embedded.PhoneNumber;
 import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 import com.smalaca.taskamanager.repository.TaskRepository;
+
+import static com.smalaca.taskmanager.command.task.OwnerDomainModel.Builder.owner;
 
 class TaskUpdateCommand {
     private final TaskRepository taskRepository;
@@ -40,24 +39,17 @@ class TaskUpdateCommand {
         }
 
         if (task.getOwner() != null) {
-            Owner o = new Owner();
-            o.setFirstName(task.getOwner().getFirstName());
-            o.setLastName(task.getOwner().getLastName());
+            OwnerDomainModel.Builder builder = owner(task.getOwner().getFirstName(), task.getOwner().getLastName());
 
             if (dto.getOwnerPhoneNumberPrefix() != null && dto.getOwnerPhoneNumberNumber() != null) {
-                PhoneNumber pno = new PhoneNumber();
-                pno.setNumber(dto.getOwnerPhoneNumberNumber());
-                pno.setPrefix(dto.getOwnerPhoneNumberPrefix());
-                o.setPhoneNumber(pno);
+                builder.withPhoneNumber(dto.getOwnerPhoneNumberNumber(), dto.getOwnerPhoneNumberPrefix());
             }
 
             if (dto.getOwnerEmailAddress() != null) {
-                EmailAddress email = new EmailAddress();
-                email.setEmailAddress(dto.getOwnerEmailAddress());
-                o.setEmailAddress(email);
+                builder.withEmailAddress(dto.getOwnerEmailAddress());
             }
 
-            task.setOwner(o);
+            task.setOwner(builder.build().toOwner());
 
         } else {
             if (dto.getOwnerId() != null) {
