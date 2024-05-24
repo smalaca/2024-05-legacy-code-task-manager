@@ -54,7 +54,7 @@ class ToDoItemProcessorImplementationOrientedTest {
                 projectBacklogService,
                 communicationService,
                 sprintBacklogService,
-                story);
+                story, project);
 
         inOrder.verify(story).getStatus();
         inOrder.verify(story).getTasks();
@@ -69,15 +69,16 @@ class ToDoItemProcessorImplementationOrientedTest {
                 communicationService,
                 sprintBacklogService,
 
-                story);
+                story, project);
     }
 
     @Test
     void shouldProcessToDoItemDefinedWhenToDoItemIsStoryAndTasksAreNotEmptyAndIsAssigned() {
         Story story = mock(Story.class);
+        Task task = mock(Task.class);
 
         given(story.getStatus()).willReturn(DEFINED);
-        given(story.getTasks()).willReturn(ImmutableList.of(mock(Task.class)));
+        given(story.getTasks()).willReturn(ImmutableList.of(task));
         given(story.isAssigned()).willReturn(true);
 
         toDoItemProcessor.processFor(story);
@@ -88,7 +89,7 @@ class ToDoItemProcessorImplementationOrientedTest {
                 projectBacklogService,
                 communicationService,
                 sprintBacklogService,
-                story);
+                story, task);
 
         inOrder.verify(story).getStatus();
         inOrder.verify(story).getTasks();
@@ -102,16 +103,17 @@ class ToDoItemProcessorImplementationOrientedTest {
                 communicationService,
                 sprintBacklogService,
 
-                story);
+                story, task);
     }
 
     @Test
     void shouldProcessToDoItemDefinedWhenToDoItemIsStoryAndTasksAreNotEmptyAndIsNotAssigned() {
         Project project = mock(Project.class);
         Story story = mock(Story.class);
+        Task task = mock(Task.class);
 
         given(story.getStatus()).willReturn(DEFINED);
-        given(story.getTasks()).willReturn(ImmutableList.of(mock(Task.class)));
+        given(story.getTasks()).willReturn(ImmutableList.of(task));
         given(story.isAssigned()).willReturn(false);
         given(story.getProject()).willReturn(project);
 
@@ -123,7 +125,7 @@ class ToDoItemProcessorImplementationOrientedTest {
                 projectBacklogService,
                 communicationService,
                 sprintBacklogService,
-                story);
+                story, project, task);
 
         inOrder.verify(story).getStatus();
         inOrder.verify(story).getTasks();
@@ -139,7 +141,7 @@ class ToDoItemProcessorImplementationOrientedTest {
                 communicationService,
                 sprintBacklogService,
 
-                story);
+                story, project, task);
     }
 
     @Test
