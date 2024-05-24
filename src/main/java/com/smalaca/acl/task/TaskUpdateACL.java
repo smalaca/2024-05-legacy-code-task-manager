@@ -4,8 +4,7 @@ import com.smalaca.taskamanager.model.entities.User;
 import com.smalaca.taskamanager.repository.UserRepository;
 import com.smalaca.taskamanager.service.ToDoItemService;
 import com.smalaca.taskmanager.command.task.TaskUpdateAntiCorruptionLayer;
-
-import java.util.Optional;
+import com.smalaca.taskmanager.command.task.UserDomainModel;
 
 public class TaskUpdateACL implements TaskUpdateAntiCorruptionLayer {
     private final ToDoItemService toDoItemService;
@@ -27,7 +26,8 @@ public class TaskUpdateACL implements TaskUpdateAntiCorruptionLayer {
     }
 
     @Override
-    public Optional<User> findById(Long ownerId) {
-        return userRepository.findById(ownerId);
+    public UserDomainModel findById(Long ownerId) {
+        User user = userRepository.findById(ownerId).get();
+        return new UserDomainModel(user);
     }
 }

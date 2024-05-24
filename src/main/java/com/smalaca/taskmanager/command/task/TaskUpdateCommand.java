@@ -6,7 +6,6 @@ import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.Owner;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
 import com.smalaca.taskamanager.model.entities.Task;
-import com.smalaca.taskamanager.model.entities.User;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 import com.smalaca.taskamanager.repository.TaskRepository;
 
@@ -65,26 +64,10 @@ class TaskUpdateCommand {
                 boolean userExists = taskUpdateAntiCorruptionLayer.existsById(dto.getOwnerId());
 
                 if (userExists) {
-                    User user = taskUpdateAntiCorruptionLayer.findById(dto.getOwnerId()).get();
-                    Owner ownr = new Owner();
+                    UserDomainModel user = taskUpdateAntiCorruptionLayer.findById(dto.getOwnerId());
+                    Owner owner = user.convertToOwner();
 
-                    if (user.getPhoneNumber() != null) {
-                        PhoneNumber number = new PhoneNumber();
-                        number.setNumber(user.getPhoneNumber().getNumber());
-                        number.setPrefix(user.getPhoneNumber().getPrefix());
-                        ownr.setPhoneNumber(number);
-                    }
-
-                    ownr.setLastName(user.getUserName().getLastName());
-                    ownr.setFirstName(user.getUserName().getFirstName());
-
-                    if (user.getEmailAddress() != null) {
-                        EmailAddress eAdd = new EmailAddress();
-                        eAdd.setEmailAddress(user.getEmailAddress().getEmailAddress());
-                        ownr.setEmailAddress(eAdd);
-                    }
-
-                    task.setOwner(ownr);
+                    task.setOwner(owner);
                 } else {
                     return UpdateStatus.USER_NOT_FOUND;
                 }
