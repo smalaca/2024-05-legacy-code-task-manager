@@ -9,7 +9,7 @@ public class StoryDomainModel {
         this.story = story;
     }
 
-    Story asStory() {
+    public Story asStory() {
         return story;
     }
 }

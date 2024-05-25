@@ -1,6 +1,7 @@
 package com.smalaca.taskamanager.api.rest;
 
 
+import com.smalaca.acl.StoryDomainModelRepositoryACL;
 import com.smalaca.acl.task.OwnerDomainModelRepositoryACL;
 import com.smalaca.acl.task.StatusChangeServiceACL;
 import com.smalaca.acl.task.TaskDomainModelRepositoryACL;
@@ -64,7 +65,8 @@ public class TaskController {
                 userRepository, storyRepository, taskRepository,
                 new StatusChangeServiceACL(toDoItemService),
                 new TaskDomainModelRepositoryACL(taskRepository),
-                new OwnerDomainModelRepositoryACL(userRepository));
+                new OwnerDomainModelRepositoryACL(userRepository),
+                new StoryDomainModelRepositoryACL(storyRepository));
     }
 
     @Transactional
