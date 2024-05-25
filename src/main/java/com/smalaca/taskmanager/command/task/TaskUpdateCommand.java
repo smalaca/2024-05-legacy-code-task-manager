@@ -3,14 +3,16 @@ package com.smalaca.taskmanager.command.task;
 import java.util.Optional;
 
 class TaskUpdateCommand {
+    private final TaskDomainModelRepository taskDomainModelRepository;
     private final TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer;
 
-    TaskUpdateCommand(TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer) {
+    TaskUpdateCommand(TaskDomainModelRepository taskDomainModelRepository, TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer) {
+        this.taskDomainModelRepository = taskDomainModelRepository;
         this.taskUpdateAntiCorruptionLayer = taskUpdateAntiCorruptionLayer;
     }
 
     UpdateStatus process(UpdateTaskDto dto) {
-        Optional<TaskDomainModel> found = taskUpdateAntiCorruptionLayer.findTaskById(dto.getTaskId());
+        Optional<TaskDomainModel> found = taskDomainModelRepository.findById(dto.getTaskId());
 
         if (found.isEmpty()) {
             return UpdateStatus.TASK_NOT_FOUND;
@@ -42,7 +44,7 @@ class TaskUpdateCommand {
             }
         }
 
-        taskUpdateAntiCorruptionLayer.save(taskDomainModel);
+        taskDomainModelRepository.save(taskDomainModel);
 
         return UpdateStatus.SUCCESS;
     }

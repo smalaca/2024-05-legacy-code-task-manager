@@ -31,7 +31,7 @@ public class TaskAntiCorruptionLayer implements TaskUpdateAntiCorruptionLayer, T
     }
 
     @Override
-    public Optional<TaskDomainModel> findTaskById(Long taskId) {
+    public Optional<TaskDomainModel> findById(Long taskId) {
         Optional<Task> found = taskRepository.findById(taskId);
         return found.map(TaskDomainModel::new);
     }
