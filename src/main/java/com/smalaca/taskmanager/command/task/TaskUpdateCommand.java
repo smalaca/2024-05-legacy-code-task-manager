@@ -39,18 +39,18 @@ class TaskUpdateCommand {
         if (task.getOwner() != null) {
             OwnerDomainModel.Builder builder = owner(task.getOwner().getFirstName(), task.getOwner().getLastName());
 
-            if (dto.getOwnerPhoneNumber() != null && dto.getOwnerPhonePrefix() != null) {
+            if (dto.hasOwnerPhoneNumber()) {
                 builder.withPhoneNumber(dto.getOwnerPhoneNumber(), dto.getOwnerPhonePrefix());
             }
 
-            if (dto.getOwnerEmailAddress() != null) {
+            if (dto.hasOwnerEmailAddress()) {
                 builder.withEmailAddress(dto.getOwnerEmailAddress());
             }
 
             task.setOwner(builder.build().toOwner());
 
         } else {
-            if (dto.getOwnerId() != null) {
+            if (hasOwnerId(dto)) {
                 Optional<UserDomainModel> found = taskUpdateAntiCorruptionLayer.findUserById(dto.getOwnerId());
 
                 if (found.isPresent()) {
@@ -66,5 +66,9 @@ class TaskUpdateCommand {
         taskRepository.save(taskDomainModel.asTask());
 
         return UpdateStatus.SUCCESS;
+    }
+
+    private boolean hasOwnerId(UpdateTaskDto dto) {
+        return dto.getOwnerId() != null;
     }
 }

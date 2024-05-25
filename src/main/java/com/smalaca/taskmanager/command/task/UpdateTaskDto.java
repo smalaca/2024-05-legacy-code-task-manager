@@ -32,4 +32,12 @@ class UpdateTaskDto {
     boolean hasStatus() {
         return status != null;
     }
+
+    boolean hasOwnerPhoneNumber() {
+        return ownerPhoneNumber != null && ownerPhonePrefix != null;
+    }
+
+    boolean hasOwnerEmailAddress() {
+        return ownerEmailAddress != null;
+    }
 }
