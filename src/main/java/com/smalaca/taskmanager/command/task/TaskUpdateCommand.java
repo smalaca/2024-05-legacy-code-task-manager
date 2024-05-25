@@ -1,6 +1,5 @@
 package com.smalaca.taskmanager.command.task;
 
-import com.smalaca.taskamanager.dto.TaskDto;
 import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.repository.TaskRepository;
 
@@ -17,43 +16,42 @@ class TaskUpdateCommand {
         this.taskUpdateAntiCorruptionLayer = taskUpdateAntiCorruptionLayer;
     }
 
-    UpdateStatus process(long id, TaskDto dto) {
-        UpdateTaskDto command = dto.asUpdateTaskDto(id);
-        Optional<Task> found = taskRepository.findById(command.getTaskId());
+    UpdateStatus process(UpdateTaskDto dto) {
+        Optional<Task> found = taskRepository.findById(dto.getTaskId());
 
         if (found.isEmpty()) {
             return UpdateStatus.TASK_NOT_FOUND;
         } else {
-            return update(found.get(), command);
+            return update(found.get(), dto);
         }
     }
 
-    private UpdateStatus update(Task task, UpdateTaskDto command) {
+    private UpdateStatus update(Task task, UpdateTaskDto dto) {
         TaskDomainModel taskDomainModel = new TaskDomainModel(task);
-        if (command.hasDescription()) {
-            taskDomainModel.changeDescription(command.getDescription());
+        if (dto.hasDescription()) {
+            taskDomainModel.changeDescription(dto.getDescription());
         }
 
-        if (taskDomainModel.changeStatusIfNeeded(command)) {
+        if (taskDomainModel.changeStatusIfNeeded(dto)) {
             taskUpdateAntiCorruptionLayer.processTask(taskDomainModel.getId());
         }
 
         if (task.getOwner() != null) {
             OwnerDomainModel.Builder builder = owner(task.getOwner().getFirstName(), task.getOwner().getLastName());
 
-            if (command.getOwnerPhoneNumber() != null && command.getOwnerPhonePrefix() != null) {
-                builder.withPhoneNumber(command.getOwnerPhoneNumber(), command.getOwnerPhonePrefix());
+            if (dto.getOwnerPhoneNumber() != null && dto.getOwnerPhonePrefix() != null) {
+                builder.withPhoneNumber(dto.getOwnerPhoneNumber(), dto.getOwnerPhonePrefix());
             }
 
-            if (command.getOwnerEmailAddress() != null) {
-                builder.withEmailAddress(command.getOwnerEmailAddress());
+            if (dto.getOwnerEmailAddress() != null) {
+                builder.withEmailAddress(dto.getOwnerEmailAddress());
             }
 
             task.setOwner(builder.build().toOwner());
 
         } else {
-            if (command.getOwnerId() != null) {
-                Optional<UserDomainModel> found = taskUpdateAntiCorruptionLayer.findUserById(command.getOwnerId());
+            if (dto.getOwnerId() != null) {
+                Optional<UserDomainModel> found = taskUpdateAntiCorruptionLayer.findUserById(dto.getOwnerId());
 
                 if (found.isPresent()) {
                     UserDomainModel user = found.get();

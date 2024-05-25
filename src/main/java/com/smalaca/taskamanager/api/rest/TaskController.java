@@ -72,7 +72,7 @@ public class TaskController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(@PathVariable long id, @RequestBody TaskDto dto) {
-        UpdateStatus status = taskCommandApi.update(id, dto);
+        UpdateStatus status = taskCommandApi.update(dto.asUpdateTaskDto(id));
 
         switch (status) {
             case TASK_NOT_FOUND:

@@ -90,8 +90,8 @@ public class TaskCommandApi {
         return ResponseEntity.ok(saved.getId());
     }
 
-    public UpdateStatus update(long id, TaskDto dto) {
-        return taskUpdateCommand.process(id, dto);
+    public UpdateStatus update(UpdateTaskDto updateTaskDto) {
+        return taskUpdateCommand.process(updateTaskDto);
     }
 
     public ResponseEntity<Void> delete(long id) {
