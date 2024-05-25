@@ -2,17 +2,13 @@ package com.smalaca.taskmanager.command.task;
 
 import com.smalaca.taskamanager.dto.TaskDto;
 import com.smalaca.taskamanager.dto.WatcherDto;
-import com.smalaca.taskamanager.exception.ProjectNotFoundException;
 import com.smalaca.taskamanager.exception.TaskDoesNotExistException;
 import com.smalaca.taskamanager.exception.UserNotFoundException;
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
-import com.smalaca.taskamanager.model.embedded.Owner;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
 import com.smalaca.taskamanager.model.embedded.Watcher;
-import com.smalaca.taskamanager.model.entities.Story;
 import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.model.entities.User;
-import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 import com.smalaca.taskamanager.repository.StoryRepository;
 import com.smalaca.taskamanager.repository.TaskRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
@@ -27,6 +23,7 @@ public class TaskCommandApi {
     private final StoryRepository storyRepository;
     private final TaskRepository taskRepository;
     private final TaskUpdateCommand taskUpdateCommand;
+    private final TaskCreateCommand taskCreateCommand;
 
     public TaskCommandApi(
             UserRepository userRepository, StoryRepository storyRepository, TaskRepository taskRepository,
@@ -34,60 +31,13 @@ public class TaskCommandApi {
         this.userRepository = userRepository;
         this.storyRepository = storyRepository;
         this.taskRepository = taskRepository;
-        this.taskUpdateCommand = new TaskUpdateCommand(taskDomainModelRepository, ownerDomainModelRepository, statusChangeService);
+        taskCreateCommand = new TaskCreateCommand(userRepository, storyRepository, taskRepository);
+        taskUpdateCommand = new TaskUpdateCommand(taskDomainModelRepository, ownerDomainModelRepository, statusChangeService);
         taskDeleteCommand = new TaskDeleteCommand(taskDomainModelRepository);
     }
 
     public Long create(TaskDto dto) {
-        Task t = new Task();
-        t.setTitle(dto.getTitle());
-        t.setDescription(dto.getDescription());
-        t.setStatus(ToDoItemStatus.valueOf(dto.getStatus()));
-
-        if (dto.getOwnerId() != null) {
-            Optional<User> found = userRepository.findById(dto.getOwnerId());
-
-            if (found.isEmpty()) {
-                throw new OwnerDomainModelNotFoundException(dto.getOwnerId());
-            } else {
-                User u = found.get();
-                Owner o = new Owner();
-                o.setLastName(u.getUserName().getLastName());
-                o.setFirstName(u.getUserName().getFirstName());
-
-                if (u.getEmailAddress() != null) {
-                    EmailAddress ea = new EmailAddress();
-                    ea.setEmailAddress(u.getEmailAddress().getEmailAddress());
-                    o.setEmailAddress(ea);
-                }
-
-                if (u.getPhoneNumber() != null) {
-                    PhoneNumber pn = new PhoneNumber();
-                    pn.setNumber(u.getPhoneNumber().getNumber());
-                    pn.setPrefix(u.getPhoneNumber().getPrefix());
-                    o.setPhoneNumber(pn);
-                }
-
-                t.setOwner(o);
-            }
-        }
-
-        if (dto.getStoryId() != null) {
-            Story str;
-            if (!storyRepository.existsById(dto.getStoryId())) {
-                throw new ProjectNotFoundException();
-            }
-
-            str = storyRepository.findById(dto.getStoryId()).get();
-
-            t.setStory(str);
-            str.addTask(t);
-            storyRepository.save(str);
-        }
-
-        Task saved = taskRepository.save(t);
-
-        return saved.getId();
+        return taskCreateCommand.process(dto);
     }
 
     public CommandStatus update(UpdateTaskDto updateTaskDto) {
