@@ -13,12 +13,12 @@ import java.util.Optional;
 
 import static com.smalaca.taskmanager.command.task.OwnerDomainModel.Builder.owner;
 
-public class TaskUpdateACL implements TaskUpdateAntiCorruptionLayer {
+public class TaskAntiCorruptionLayer implements TaskUpdateAntiCorruptionLayer {
     private final ToDoItemService toDoItemService;
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
 
-    public TaskUpdateACL(ToDoItemService toDoItemService, UserRepository userRepository, TaskRepository taskRepository) {
+    public TaskAntiCorruptionLayer(ToDoItemService toDoItemService, UserRepository userRepository, TaskRepository taskRepository) {
         this.toDoItemService = toDoItemService;
         this.userRepository = userRepository;
         this.taskRepository = taskRepository;

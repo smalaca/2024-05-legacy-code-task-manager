@@ -1,7 +1,7 @@
 package com.smalaca.taskamanager.api.rest;
 
 
-import com.smalaca.acl.task.TaskUpdateACL;
+import com.smalaca.acl.task.TaskAntiCorruptionLayer;
 import com.smalaca.taskamanager.dto.AssigneeDto;
 import com.smalaca.taskamanager.dto.StakeholderDto;
 import com.smalaca.taskamanager.dto.TaskDto;
@@ -56,7 +56,7 @@ public class TaskController {
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
         taskQueryApi = new TaskQueryApi(taskRepository);
-        taskCommandApi = new TaskCommandApi(userRepository, storyRepository, taskRepository, new TaskUpdateACL(toDoItemService, userRepository, taskRepository));
+        taskCommandApi = new TaskCommandApi(userRepository, storyRepository, taskRepository, new TaskAntiCorruptionLayer(toDoItemService, userRepository, taskRepository));
     }
 
     @Transactional
