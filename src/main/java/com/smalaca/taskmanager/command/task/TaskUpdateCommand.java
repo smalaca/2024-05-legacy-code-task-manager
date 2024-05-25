@@ -18,14 +18,7 @@ class TaskUpdateCommand {
     }
 
     UpdateStatus process(long id, TaskDto dto) {
-        UpdateTaskDto command = new UpdateTaskDto(
-                id,
-                dto.getStatus(),
-                dto.getDescription(),
-                dto.getOwnerId(),
-                dto.getOwnerPhoneNumberNumber(),
-                dto.getOwnerPhoneNumberPrefix(),
-                dto.getOwnerEmailAddress());
+        UpdateTaskDto command = dto.asUpdateTaskDto(id);
         Optional<Task> found = taskRepository.findById(command.getTaskId());
 
         if (found.isEmpty()) {

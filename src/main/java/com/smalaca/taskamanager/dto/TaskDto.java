@@ -1,5 +1,7 @@
 package com.smalaca.taskamanager.dto;
 
+import com.smalaca.taskmanager.command.task.UpdateTaskDto;
+
 import java.util.List;
 
 @SuppressWarnings("MethodCount")
@@ -129,5 +131,16 @@ public class TaskDto {
 
     public void setAssignee(AssigneeDto assignee) {
         this.assignee = assignee;
+    }
+
+    public UpdateTaskDto asUpdateTaskDto(long id) {
+        return new UpdateTaskDto(
+                id,
+                status,
+                description,
+                ownerId,
+                ownerPhoneNumberNumber,
+                ownerPhoneNumberPrefix,
+                ownerEmailAddress);
     }
 }

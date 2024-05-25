@@ -3,6 +3,7 @@ package com.smalaca.taskmanager.command.task;
 import lombok.Getter;
 
 @Getter
+public
 class UpdateTaskDto {
     private final Long taskId;
     private final String status;
@@ -12,7 +13,7 @@ class UpdateTaskDto {
     private final String ownerPhonePrefix;
     private final String ownerEmailAddress;
 
-    UpdateTaskDto(
+    public UpdateTaskDto(
             Long taskId, String status, String description, Long ownerId,
             String ownerPhoneNumber, String ownerPhonePrefix, String ownerEmailAddress) {
         this.taskId = taskId;
