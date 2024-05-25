@@ -13,17 +13,17 @@ class TaskUpdateCommand {
         this.statusChangeService = statusChangeService;
     }
 
-    UpdateStatus process(UpdateTaskDto dto) {
+    CommandStatus process(UpdateTaskDto dto) {
         Optional<TaskDomainModel> found = taskDomainModelRepository.findById(dto.getTaskId());
 
         if (found.isEmpty()) {
-            return UpdateStatus.TASK_NOT_FOUND;
+            return CommandStatus.TASK_NOT_FOUND;
         } else {
             return update(found.get(), dto);
         }
     }
 
-    private UpdateStatus update(TaskDomainModel taskDomainModel, UpdateTaskDto dto) {
+    private CommandStatus update(TaskDomainModel taskDomainModel, UpdateTaskDto dto) {
         if (dto.hasDescription()) {
             taskDomainModel.changeDescription(dto.getDescription());
         }
@@ -41,14 +41,14 @@ class TaskUpdateCommand {
                 if (found.isPresent()) {
                     taskDomainModel.setOwner(found.get());
                 } else {
-                    return UpdateStatus.USER_NOT_FOUND;
+                    return CommandStatus.OWNER_NOT_FOUND;
                 }
             }
         }
 
         taskDomainModelRepository.save(taskDomainModel);
 
-        return UpdateStatus.SUCCESS;
+        return CommandStatus.SUCCESS;
     }
 
 }

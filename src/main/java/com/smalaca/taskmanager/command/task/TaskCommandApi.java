@@ -94,7 +94,7 @@ public class TaskCommandApi {
         return ResponseEntity.ok(saved.getId());
     }
 
-    public UpdateStatus update(UpdateTaskDto updateTaskDto) {
+    public CommandStatus update(UpdateTaskDto updateTaskDto) {
         return taskUpdateCommand.process(updateTaskDto);
     }
 
