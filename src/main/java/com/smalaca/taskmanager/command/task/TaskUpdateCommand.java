@@ -4,10 +4,12 @@ import java.util.Optional;
 
 class TaskUpdateCommand {
     private final TaskDomainModelRepository taskDomainModelRepository;
+    private final OwnerDomainModelRepository ownerDomainModelRepository;
     private final TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer;
 
-    TaskUpdateCommand(TaskDomainModelRepository taskDomainModelRepository, TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer) {
+    TaskUpdateCommand(TaskDomainModelRepository taskDomainModelRepository, OwnerDomainModelRepository ownerDomainModelRepository, TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer) {
         this.taskDomainModelRepository = taskDomainModelRepository;
+        this.ownerDomainModelRepository = ownerDomainModelRepository;
         this.taskUpdateAntiCorruptionLayer = taskUpdateAntiCorruptionLayer;
     }
 
@@ -34,7 +36,7 @@ class TaskUpdateCommand {
             taskDomainModel.updateOwner(dto);
         } else {
             if (dto.hasOwnerId()) {
-                Optional<OwnerDomainModel> found = taskUpdateAntiCorruptionLayer.findOwnerById(dto.getOwnerId());
+                Optional<OwnerDomainModel> found = ownerDomainModelRepository.findById(dto.getOwnerId());
 
                 if (found.isPresent()) {
                     taskDomainModel.setOwner(found.get());

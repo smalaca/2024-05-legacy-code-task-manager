@@ -23,18 +23,18 @@ import java.util.Optional;
 
 public class TaskCommandApi {
     private final TaskDeleteCommand taskDeleteCommand;
-    private UserRepository userRepository;
-    private StoryRepository storyRepository;
-    private TaskRepository taskRepository;
-    private TaskUpdateCommand taskUpdateCommand;
+    private final UserRepository userRepository;
+    private final StoryRepository storyRepository;
+    private final TaskRepository taskRepository;
+    private final TaskUpdateCommand taskUpdateCommand;
 
     public TaskCommandApi(
             UserRepository userRepository, StoryRepository storyRepository, TaskRepository taskRepository,
-            TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer, TaskDomainModelRepository taskDomainModelRepository) {
+            TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer, TaskDomainModelRepository taskDomainModelRepository, OwnerDomainModelRepository ownerDomainModelRepository) {
         this.userRepository = userRepository;
         this.storyRepository = storyRepository;
         this.taskRepository = taskRepository;
-        this.taskUpdateCommand = new TaskUpdateCommand(taskDomainModelRepository, taskUpdateAntiCorruptionLayer);
+        this.taskUpdateCommand = new TaskUpdateCommand(taskDomainModelRepository, ownerDomainModelRepository, taskUpdateAntiCorruptionLayer);
         taskDeleteCommand = new TaskDeleteCommand(taskDomainModelRepository);
     }
 

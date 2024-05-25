@@ -48,24 +48,4 @@ public class TaskAntiCorruptionLayer implements TaskUpdateAntiCorruptionLayer, T
 
         return found.isPresent();
     }
-
-    @Override
-    public Optional<OwnerDomainModel> findOwnerById(Long userId) {
-        Optional<User> found = userRepository.findById(userId);
-        return found.map(this::asOwner);
-    }
-
-    private OwnerDomainModel asOwner(User user) {
-        OwnerDomainModel.Builder builder = owner(user.getUserName().getFirstName(), user.getUserName().getLastName());
-
-        if (user.getPhoneNumber() != null) {
-            builder.withPhoneNumber(user.getPhoneNumber().getNumber(), user.getPhoneNumber().getPrefix());
-        }
-
-        if (user.getEmailAddress() != null) {
-            builder.withEmailAddress(user.getEmailAddress().getEmailAddress());
-        }
-
-        return builder.build();
-    }
 }

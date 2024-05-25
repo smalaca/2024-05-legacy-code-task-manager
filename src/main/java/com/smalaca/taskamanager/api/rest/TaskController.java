@@ -1,6 +1,7 @@
 package com.smalaca.taskamanager.api.rest;
 
 
+import com.smalaca.acl.task.OwnerDomainModelRepositoryACL;
 import com.smalaca.acl.task.TaskAntiCorruptionLayer;
 import com.smalaca.taskamanager.dto.AssigneeDto;
 import com.smalaca.taskamanager.dto.StakeholderDto;
@@ -22,6 +23,8 @@ import com.smalaca.taskamanager.repository.TaskRepository;
 import com.smalaca.taskamanager.repository.TeamRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
 import com.smalaca.taskamanager.service.ToDoItemService;
+import com.smalaca.taskmanager.command.task.OwnerDomainModel;
+import com.smalaca.taskmanager.command.task.OwnerDomainModelRepository;
 import com.smalaca.taskmanager.command.task.TaskCommandApi;
 import com.smalaca.taskmanager.command.task.UpdateStatus;
 import com.smalaca.taskmanager.query.task.TaskQueryApi;
@@ -58,7 +61,8 @@ public class TaskController {
         taskQueryApi = new TaskQueryApi(taskRepository);
         TaskAntiCorruptionLayer antiCorruptionLayer = new TaskAntiCorruptionLayer(toDoItemService, userRepository, taskRepository);
         taskCommandApi = new TaskCommandApi(
-                userRepository, storyRepository, taskRepository, antiCorruptionLayer, antiCorruptionLayer);
+                userRepository, storyRepository, taskRepository, antiCorruptionLayer,
+                antiCorruptionLayer, new OwnerDomainModelRepositoryACL(userRepository));
     }
 
     @Transactional
