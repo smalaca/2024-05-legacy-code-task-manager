@@ -1,33 +1,34 @@
 package com.smalaca.taskmanager.command.task;
 
+import lombok.Getter;
+
+@Getter
 class UpdateTaskDto {
-    private final long id;
+    private final Long taskId;
     private final String status;
     private final String description;
+    private final Long ownerId;
+    private final String ownerPhoneNumber;
+    private final String ownerPhonePrefix;
+    private final String ownerEmailAddress;
 
-    UpdateTaskDto(long id, String status, String description) {
-        this.id = id;
+    UpdateTaskDto(
+            Long taskId, String status, String description, Long ownerId,
+            String ownerPhoneNumber, String ownerPhonePrefix, String ownerEmailAddress) {
+        this.taskId = taskId;
         this.status = status;
         this.description = description;
-    }
-
-    long getId() {
-        return id;
+        this.ownerId = ownerId;
+        this.ownerPhoneNumber = ownerPhoneNumber;
+        this.ownerPhonePrefix = ownerPhonePrefix;
+        this.ownerEmailAddress = ownerEmailAddress;
     }
 
     boolean hasDescription() {
         return description != null;
     }
 
-    String getDescription() {
-        return description;
-    }
-
     boolean hasStatus() {
         return status != null;
-    }
-
-    String getStatus() {
-        return status;
     }
 }

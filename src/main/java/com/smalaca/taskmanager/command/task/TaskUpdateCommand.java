@@ -21,17 +21,21 @@ class TaskUpdateCommand {
         UpdateTaskDto command = new UpdateTaskDto(
                 id,
                 dto.getStatus(),
-                dto.getDescription());
-        Optional<Task> found = taskRepository.findById(command.getId());
+                dto.getDescription(),
+                dto.getOwnerId(),
+                dto.getOwnerPhoneNumberNumber(),
+                dto.getOwnerPhoneNumberPrefix(),
+                dto.getOwnerEmailAddress());
+        Optional<Task> found = taskRepository.findById(command.getTaskId());
 
         if (found.isEmpty()) {
             return UpdateStatus.TASK_NOT_FOUND;
         } else {
-            return update(found.get(), dto, command);
+            return update(found.get(), command);
         }
     }
 
-    private UpdateStatus update(Task task, TaskDto dto, UpdateTaskDto command) {
+    private UpdateStatus update(Task task, UpdateTaskDto command) {
         TaskDomainModel taskDomainModel = new TaskDomainModel(task);
         if (command.hasDescription()) {
             taskDomainModel.changeDescription(command.getDescription());
@@ -44,19 +48,19 @@ class TaskUpdateCommand {
         if (task.getOwner() != null) {
             OwnerDomainModel.Builder builder = owner(task.getOwner().getFirstName(), task.getOwner().getLastName());
 
-            if (dto.getOwnerPhoneNumberPrefix() != null && dto.getOwnerPhoneNumberNumber() != null) {
-                builder.withPhoneNumber(dto.getOwnerPhoneNumberNumber(), dto.getOwnerPhoneNumberPrefix());
+            if (command.getOwnerPhoneNumber() != null && command.getOwnerPhonePrefix() != null) {
+                builder.withPhoneNumber(command.getOwnerPhoneNumber(), command.getOwnerPhonePrefix());
             }
 
-            if (dto.getOwnerEmailAddress() != null) {
-                builder.withEmailAddress(dto.getOwnerEmailAddress());
+            if (command.getOwnerEmailAddress() != null) {
+                builder.withEmailAddress(command.getOwnerEmailAddress());
             }
 
             task.setOwner(builder.build().toOwner());
 
         } else {
-            if (dto.getOwnerId() != null) {
-                Optional<UserDomainModel> found = taskUpdateAntiCorruptionLayer.findUserById(dto.getOwnerId());
+            if (command.getOwnerId() != null) {
+                Optional<UserDomainModel> found = taskUpdateAntiCorruptionLayer.findUserById(command.getOwnerId());
 
                 if (found.isPresent()) {
                     UserDomainModel user = found.get();
