@@ -20,12 +20,11 @@ class TaskUpdateCommand {
         if (found.isEmpty()) {
             return UpdateStatus.TASK_NOT_FOUND;
         } else {
-            return update(found.get(), dto);
+            return update(new TaskDomainModel(found.get()), dto);
         }
     }
 
-    private UpdateStatus update(Task task, UpdateTaskDto dto) {
-        TaskDomainModel taskDomainModel = new TaskDomainModel(task);
+    private UpdateStatus update(TaskDomainModel taskDomainModel, UpdateTaskDto dto) {
         if (dto.hasDescription()) {
             taskDomainModel.changeDescription(dto.getDescription());
         }
@@ -44,12 +43,13 @@ class TaskUpdateCommand {
                     UserDomainModel user = found.get();
                     OwnerDomainModel ownerDomainModel = user.convertToOwner();
 
-                    task.setOwner(ownerDomainModel.toOwner());
+                    taskDomainModel.setOwner(ownerDomainModel);
                 } else {
                     return UpdateStatus.USER_NOT_FOUND;
                 }
             }
         }
+
         taskRepository.save(taskDomainModel.asTask());
 
         return UpdateStatus.SUCCESS;

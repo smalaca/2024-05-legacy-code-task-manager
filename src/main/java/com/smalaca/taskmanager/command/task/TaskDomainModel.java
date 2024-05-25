@@ -54,4 +54,8 @@ class TaskDomainModel {
             task.getOwner().setEmailAddress(emailAddress);
         }
     }
+
+    void setOwner(OwnerDomainModel ownerDomainModel) {
+        task.setOwner(ownerDomainModel.toOwner());
+    }
 }
