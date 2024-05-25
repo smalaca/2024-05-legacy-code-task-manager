@@ -1,8 +1,5 @@
 package com.smalaca.taskmanager.command.task;
 
-import com.smalaca.taskamanager.model.entities.Task;
-import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
-
 import java.util.Optional;
 
 class TaskCreateCommand {
@@ -19,11 +16,7 @@ class TaskCreateCommand {
     }
 
     Long process(CreateTaskDto dto) {
-        Task t = new Task();
-        TaskDomainModel task = new TaskDomainModel(t);
-        t.setTitle(dto.getTitle());
-        t.setDescription(dto.getDescription());
-        t.setStatus(ToDoItemStatus.valueOf(dto.getStatus()));
+        TaskDomainModel task = new TaskDomainModel(dto.getTitle(), dto.getDescription(), dto.getStatus());
 
         if (dto.hasOwnerId()) {
             Optional<OwnerDomainModel> found = ownerDomainModelRepository.findById(dto.getOwnerId());

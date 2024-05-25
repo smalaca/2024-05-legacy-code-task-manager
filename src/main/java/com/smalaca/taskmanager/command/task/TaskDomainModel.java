@@ -13,6 +13,13 @@ public class TaskDomainModel {
         this.task = task;
     }
 
+    public TaskDomainModel(String title, String description, String status) {
+        task = new Task();
+        task.setTitle(title);
+        task.setDescription(description);
+        task.setStatus(ToDoItemStatus.valueOf(status));
+    }
+
     public Task asTask() {
         return task;
     }
