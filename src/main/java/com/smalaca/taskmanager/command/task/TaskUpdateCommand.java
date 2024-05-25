@@ -1,26 +1,21 @@
 package com.smalaca.taskmanager.command.task;
 
-import com.smalaca.taskamanager.model.entities.Task;
-import com.smalaca.taskamanager.repository.TaskRepository;
-
 import java.util.Optional;
 
 class TaskUpdateCommand {
-    private final TaskRepository taskRepository;
     private final TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer;
 
-    TaskUpdateCommand(TaskRepository taskRepository, TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer) {
-        this.taskRepository = taskRepository;
+    TaskUpdateCommand(TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer) {
         this.taskUpdateAntiCorruptionLayer = taskUpdateAntiCorruptionLayer;
     }
 
     UpdateStatus process(UpdateTaskDto dto) {
-        Optional<Task> found = taskRepository.findById(dto.getTaskId());
+        Optional<TaskDomainModel> found = taskUpdateAntiCorruptionLayer.findTaskById(dto.getTaskId());
 
         if (found.isEmpty()) {
             return UpdateStatus.TASK_NOT_FOUND;
         } else {
-            return update(new TaskDomainModel(found.get()), dto);
+            return update(found.get(), dto);
         }
     }
 
@@ -50,7 +45,7 @@ class TaskUpdateCommand {
             }
         }
 
-        taskRepository.save(taskDomainModel.asTask());
+        taskUpdateAntiCorruptionLayer.save(taskDomainModel);
 
         return UpdateStatus.SUCCESS;
     }

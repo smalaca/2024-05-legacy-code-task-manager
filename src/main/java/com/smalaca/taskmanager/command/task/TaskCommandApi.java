@@ -31,7 +31,7 @@ public class TaskCommandApi {
         this.userRepository = userRepository;
         this.storyRepository = storyRepository;
         this.taskRepository = taskRepository;
-        this.taskUpdateCommand = new TaskUpdateCommand(taskRepository, taskUpdateAntiCorruptionLayer);
+        this.taskUpdateCommand = new TaskUpdateCommand(taskUpdateAntiCorruptionLayer);
     }
 
     public ResponseEntity<Long> create(TaskDto dto) {
