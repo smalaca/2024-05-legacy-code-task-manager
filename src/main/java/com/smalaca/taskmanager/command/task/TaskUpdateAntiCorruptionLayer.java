@@ -9,5 +9,5 @@ public interface TaskUpdateAntiCorruptionLayer {
 
     void save(TaskDomainModel taskDomainModel);
 
-    Optional<UserDomainModel> findUserById(Long ownerId);
+    Optional<OwnerDomainModel> findOwnerById(Long ownerId);
 }

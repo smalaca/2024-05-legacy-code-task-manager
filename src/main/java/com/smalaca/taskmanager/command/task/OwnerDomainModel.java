@@ -45,7 +45,7 @@ public class OwnerDomainModel {
         return emailAddress;
     }
 
-    static class Builder {
+    public static class Builder {
         private final String firstName;
         private final String lastName;
         private String phoneNumber;
@@ -57,20 +57,20 @@ public class OwnerDomainModel {
             this.lastName = lastName;
         }
 
-        static Builder owner(String firstName, String lastName) {
+        public static Builder owner(String firstName, String lastName) {
             return new Builder(firstName, lastName);
         }
 
-        void withPhoneNumber(String phoneNumber, String phonePrefix) {
+        public void withPhoneNumber(String phoneNumber, String phonePrefix) {
             this.phoneNumber = phoneNumber;
             this.phonePrefix = phonePrefix;
         }
 
-        void withEmailAddress(String emailAddress) {
+        public void withEmailAddress(String emailAddress) {
             this.emailAddress = emailAddress;
         }
 
-        OwnerDomainModel build() {
+        public OwnerDomainModel build() {
             return new OwnerDomainModel(this);
         }
     }

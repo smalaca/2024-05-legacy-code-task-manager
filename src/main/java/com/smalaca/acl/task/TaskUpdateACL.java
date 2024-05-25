@@ -5,11 +5,13 @@ import com.smalaca.taskamanager.model.entities.User;
 import com.smalaca.taskamanager.repository.TaskRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
 import com.smalaca.taskamanager.service.ToDoItemService;
+import com.smalaca.taskmanager.command.task.OwnerDomainModel;
 import com.smalaca.taskmanager.command.task.TaskDomainModel;
 import com.smalaca.taskmanager.command.task.TaskUpdateAntiCorruptionLayer;
-import com.smalaca.taskmanager.command.task.UserDomainModel;
 
 import java.util.Optional;
+
+import static com.smalaca.taskmanager.command.task.OwnerDomainModel.Builder.owner;
 
 public class TaskUpdateACL implements TaskUpdateAntiCorruptionLayer {
     private final ToDoItemService toDoItemService;
@@ -39,8 +41,22 @@ public class TaskUpdateACL implements TaskUpdateAntiCorruptionLayer {
     }
 
     @Override
-    public Optional<UserDomainModel> findUserById(Long userId) {
+    public Optional<OwnerDomainModel> findOwnerById(Long userId) {
         Optional<User> found = userRepository.findById(userId);
-        return found.map(UserDomainModel::new);
+        return found.map(this::asOwner);
+    }
+
+    private OwnerDomainModel asOwner(User user) {
+        OwnerDomainModel.Builder builder = owner(user.getUserName().getFirstName(), user.getUserName().getLastName());
+
+        if (user.getPhoneNumber() != null) {
+            builder.withPhoneNumber(user.getPhoneNumber().getNumber(), user.getPhoneNumber().getPrefix());
+        }
+
+        if (user.getEmailAddress() != null) {
+            builder.withEmailAddress(user.getEmailAddress().getEmailAddress());
+        }
+
+        return builder.build();
     }
 }
