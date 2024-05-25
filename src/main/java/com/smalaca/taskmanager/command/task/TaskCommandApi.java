@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.Optional;
 
 public class TaskCommandApi {
+    private final TaskDeleteCommand taskDeleteCommand;
     private UserRepository userRepository;
     private StoryRepository storyRepository;
     private TaskRepository taskRepository;
@@ -32,6 +33,7 @@ public class TaskCommandApi {
         this.storyRepository = storyRepository;
         this.taskRepository = taskRepository;
         this.taskUpdateCommand = new TaskUpdateCommand(taskUpdateAntiCorruptionLayer);
+        taskDeleteCommand = new TaskDeleteCommand();
     }
 
     public ResponseEntity<Long> create(TaskDto dto) {
@@ -94,20 +96,14 @@ public class TaskCommandApi {
         return taskUpdateCommand.process(updateTaskDto);
     }
 
-    public ResponseEntity<Void> delete(long id) {
-        try {
-            Optional<Task> found = taskRepository.findById(id);
+    public boolean delete(long id) {
+        Optional<Task> found = taskRepository.findById(id);
 
-            if (found.isEmpty()) {
-                throw new TaskDoesNotExistException();
-            }
-
+        if (found.isPresent()) {
             taskRepository.delete(found.get());
-
-            return ResponseEntity.ok().build();
-        } catch (TaskDoesNotExistException exception) {
-            return ResponseEntity.notFound().build();
         }
+
+        return found.isPresent();
     }
 
     public ResponseEntity<Void> addWatcher(long id, WatcherDto dto) {

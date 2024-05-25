@@ -86,17 +86,13 @@ public class TaskController {
         }
     }
 
-    private Task findById(long id) {
-        if (taskRepository.existsById(id)) {
-            return taskRepository.findById(id).get();
-        }
-
-        throw new TaskDoesNotExistException();
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable long id) {
-        return taskCommandApi.delete(id);
+        if (taskCommandApi.delete(id)) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PutMapping("/{id}/watcher")
