@@ -8,6 +8,7 @@ import com.smalaca.taskamanager.dto.AssigneeDto;
 import com.smalaca.taskamanager.dto.StakeholderDto;
 import com.smalaca.taskamanager.dto.TaskDto;
 import com.smalaca.taskamanager.dto.WatcherDto;
+import com.smalaca.taskamanager.exception.ProjectNotFoundException;
 import com.smalaca.taskamanager.exception.TaskDoesNotExistException;
 import com.smalaca.taskamanager.exception.TeamNotFoundException;
 import com.smalaca.taskamanager.exception.UserNotFoundException;
@@ -24,6 +25,7 @@ import com.smalaca.taskamanager.repository.TaskRepository;
 import com.smalaca.taskamanager.repository.TeamRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
 import com.smalaca.taskamanager.service.ToDoItemService;
+import com.smalaca.taskmanager.command.task.OwnerDomainModelNotFoundException;
 import com.smalaca.taskmanager.command.task.TaskCommandApi;
 import com.smalaca.taskmanager.command.task.CommandStatus;
 import com.smalaca.taskmanager.query.task.TaskQueryApi;
@@ -73,7 +75,12 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<Long> create(@RequestBody TaskDto dto) {
-        return taskCommandApi.create(dto);
+        try {
+            Long taskId = taskCommandApi.create(dto);
+            return ResponseEntity.ok(taskId);
+        } catch (ProjectNotFoundException | OwnerDomainModelNotFoundException exception) {
+            return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+        }
     }
 
     @PutMapping("/{id}")

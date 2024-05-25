@@ -38,7 +38,7 @@ public class TaskCommandApi {
         taskDeleteCommand = new TaskDeleteCommand(taskDomainModelRepository);
     }
 
-    public ResponseEntity<Long> create(TaskDto dto) {
+    public Long create(TaskDto dto) {
         Task t = new Task();
         t.setTitle(dto.getTitle());
         t.setDescription(dto.getDescription());
@@ -48,7 +48,7 @@ public class TaskCommandApi {
             Optional<User> found = userRepository.findById(dto.getOwnerId());
 
             if (found.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+                throw new OwnerDomainModelNotFoundException(dto.getOwnerId());
             } else {
                 User u = found.get();
                 Owner o = new Owner();
@@ -74,15 +74,11 @@ public class TaskCommandApi {
 
         if (dto.getStoryId() != null) {
             Story str;
-            try {
-                if (!storyRepository.existsById(dto.getStoryId())) {
-                    throw new ProjectNotFoundException();
-                }
-
-                str = storyRepository.findById(dto.getStoryId()).get();
-            } catch (ProjectNotFoundException exception) {
-                return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+            if (!storyRepository.existsById(dto.getStoryId())) {
+                throw new ProjectNotFoundException();
             }
+
+            str = storyRepository.findById(dto.getStoryId()).get();
 
             t.setStory(str);
             str.addTask(t);
@@ -91,7 +87,7 @@ public class TaskCommandApi {
 
         Task saved = taskRepository.save(t);
 
-        return ResponseEntity.ok(saved.getId());
+        return saved.getId();
     }
 
     public CommandStatus update(UpdateTaskDto updateTaskDto) {
