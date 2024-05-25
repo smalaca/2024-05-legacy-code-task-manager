@@ -25,7 +25,7 @@ class TaskCreateCommand {
         t.setDescription(createTaskDto.getDescription());
         t.setStatus(ToDoItemStatus.valueOf(createTaskDto.getStatus()));
 
-        if (createTaskDto.getOwnerId() != null) {
+        if (createTaskDto.hasOwnerId()) {
             Optional<OwnerDomainModel> found = ownerDomainModelRepository.findById(createTaskDto.getOwnerId());
 
             if (found.isEmpty()) {
@@ -35,7 +35,7 @@ class TaskCreateCommand {
             }
         }
 
-        if (createTaskDto.getStoryId() != null) {
+        if (createTaskDto.hasStoryId()) {
             Story str;
             if (!storyRepository.existsById(createTaskDto.getStoryId())) {
                 throw new StoryDomainModelNotFoundException(createTaskDto.getStoryId());

@@ -18,4 +18,12 @@ public class CreateTaskDto {
         this.ownerId = ownerId;
         this.storyId = storyId;
     }
+
+    boolean hasOwnerId() {
+        return ownerId != null;
+    }
+
+    boolean hasStoryId() {
+        return storyId != null;
+    }
 }
