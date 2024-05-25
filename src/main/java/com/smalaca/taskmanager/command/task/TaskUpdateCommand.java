@@ -5,8 +5,6 @@ import com.smalaca.taskamanager.repository.TaskRepository;
 
 import java.util.Optional;
 
-import static com.smalaca.taskmanager.command.task.OwnerDomainModel.Builder.owner;
-
 class TaskUpdateCommand {
     private final TaskRepository taskRepository;
     private final TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer;
@@ -36,21 +34,10 @@ class TaskUpdateCommand {
             taskUpdateAntiCorruptionLayer.processTask(taskDomainModel.getId());
         }
 
-        if (task.getOwner() != null) {
-            OwnerDomainModel.Builder builder = owner(task.getOwner().getFirstName(), task.getOwner().getLastName());
-
-            if (dto.hasOwnerPhoneNumber()) {
-                builder.withPhoneNumber(dto.getOwnerPhoneNumber(), dto.getOwnerPhonePrefix());
-            }
-
-            if (dto.hasOwnerEmailAddress()) {
-                builder.withEmailAddress(dto.getOwnerEmailAddress());
-            }
-
-            task.setOwner(builder.build().toOwner());
-
+        if (taskDomainModel.hasOwner()) {
+            taskDomainModel.updateOwner(dto);
         } else {
-            if (hasOwnerId(dto)) {
+            if (dto.hasOwnerId()) {
                 Optional<UserDomainModel> found = taskUpdateAntiCorruptionLayer.findUserById(dto.getOwnerId());
 
                 if (found.isPresent()) {
@@ -68,7 +55,4 @@ class TaskUpdateCommand {
         return UpdateStatus.SUCCESS;
     }
 
-    private boolean hasOwnerId(UpdateTaskDto dto) {
-        return dto.getOwnerId() != null;
-    }
 }

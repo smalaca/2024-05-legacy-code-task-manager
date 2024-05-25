@@ -1,5 +1,7 @@
 package com.smalaca.taskmanager.command.task;
 
+import com.smalaca.taskamanager.model.embedded.EmailAddress;
+import com.smalaca.taskamanager.model.embedded.PhoneNumber;
 import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 
@@ -32,5 +34,24 @@ class TaskDomainModel {
         }
 
         return false;
+    }
+
+    boolean hasOwner() {
+        return task.getOwner() != null;
+    }
+
+    void updateOwner(UpdateTaskDto dto) {
+        if (dto.hasOwnerPhoneNumber()) {
+            PhoneNumber phoneNumber = new PhoneNumber();
+            phoneNumber.setNumber(dto.getOwnerPhoneNumber());
+            phoneNumber.setPrefix(dto.getOwnerPhonePrefix());
+            task.getOwner().setPhoneNumber(phoneNumber);
+        }
+
+        if (dto.hasOwnerEmailAddress()) {
+            EmailAddress emailAddress = new EmailAddress();
+            emailAddress.setEmailAddress(dto.getOwnerEmailAddress());
+            task.getOwner().setEmailAddress(emailAddress);
+        }
     }
 }

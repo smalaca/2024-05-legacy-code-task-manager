@@ -40,4 +40,8 @@ class UpdateTaskDto {
     boolean hasOwnerEmailAddress() {
         return ownerEmailAddress != null;
     }
+
+    boolean hasOwnerId() {
+        return ownerId != null;
+    }
 }
