@@ -31,7 +31,7 @@ public class TaskCommandApi {
         this.userRepository = userRepository;
         this.storyRepository = storyRepository;
         this.taskRepository = taskRepository;
-        taskCreateCommand = new TaskCreateCommand(taskDomainModelRepository, userRepository, storyRepository);
+        taskCreateCommand = new TaskCreateCommand(taskDomainModelRepository, ownerDomainModelRepository, storyRepository);
         taskUpdateCommand = new TaskUpdateCommand(taskDomainModelRepository, ownerDomainModelRepository, statusChangeService);
         taskDeleteCommand = new TaskDeleteCommand(taskDomainModelRepository);
     }
