@@ -28,12 +28,14 @@ public class TaskCommandApi {
     private TaskRepository taskRepository;
     private TaskUpdateCommand taskUpdateCommand;
 
-    public TaskCommandApi(UserRepository userRepository, StoryRepository storyRepository, TaskRepository taskRepository, TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer) {
+    public TaskCommandApi(
+            UserRepository userRepository, StoryRepository storyRepository, TaskRepository taskRepository,
+            TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer, TaskDomainModelRepository taskDomainModelRepository) {
         this.userRepository = userRepository;
         this.storyRepository = storyRepository;
         this.taskRepository = taskRepository;
         this.taskUpdateCommand = new TaskUpdateCommand(taskUpdateAntiCorruptionLayer);
-        taskDeleteCommand = new TaskDeleteCommand();
+        taskDeleteCommand = new TaskDeleteCommand(taskDomainModelRepository);
     }
 
     public ResponseEntity<Long> create(TaskDto dto) {
@@ -97,13 +99,7 @@ public class TaskCommandApi {
     }
 
     public boolean delete(long id) {
-        Optional<Task> found = taskRepository.findById(id);
-
-        if (found.isPresent()) {
-            taskRepository.delete(found.get());
-        }
-
-        return found.isPresent();
+        return taskDeleteCommand.process(id);
     }
 
     public ResponseEntity<Void> addWatcher(long id, WatcherDto dto) {

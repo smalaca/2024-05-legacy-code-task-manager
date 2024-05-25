@@ -7,13 +7,14 @@ import com.smalaca.taskamanager.repository.UserRepository;
 import com.smalaca.taskamanager.service.ToDoItemService;
 import com.smalaca.taskmanager.command.task.OwnerDomainModel;
 import com.smalaca.taskmanager.command.task.TaskDomainModel;
+import com.smalaca.taskmanager.command.task.TaskDomainModelRepository;
 import com.smalaca.taskmanager.command.task.TaskUpdateAntiCorruptionLayer;
 
 import java.util.Optional;
 
 import static com.smalaca.taskmanager.command.task.OwnerDomainModel.Builder.owner;
 
-public class TaskAntiCorruptionLayer implements TaskUpdateAntiCorruptionLayer {
+public class TaskAntiCorruptionLayer implements TaskUpdateAntiCorruptionLayer, TaskDomainModelRepository {
     private final ToDoItemService toDoItemService;
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
@@ -38,6 +39,14 @@ public class TaskAntiCorruptionLayer implements TaskUpdateAntiCorruptionLayer {
     @Override
     public void save(TaskDomainModel taskDomainModel) {
         taskRepository.save(taskDomainModel.asTask());
+    }
+
+    @Override
+    public boolean delete(long id) {
+        Optional<Task> found = taskRepository.findById(id);
+        found.ifPresent(taskRepository::delete);
+
+        return found.isPresent();
     }
 
     @Override

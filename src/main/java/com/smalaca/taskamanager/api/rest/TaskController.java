@@ -56,7 +56,9 @@ public class TaskController {
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
         taskQueryApi = new TaskQueryApi(taskRepository);
-        taskCommandApi = new TaskCommandApi(userRepository, storyRepository, taskRepository, new TaskAntiCorruptionLayer(toDoItemService, userRepository, taskRepository));
+        TaskAntiCorruptionLayer antiCorruptionLayer = new TaskAntiCorruptionLayer(toDoItemService, userRepository, taskRepository);
+        taskCommandApi = new TaskCommandApi(
+                userRepository, storyRepository, taskRepository, antiCorruptionLayer, antiCorruptionLayer);
     }
 
     @Transactional
