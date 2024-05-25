@@ -20,7 +20,7 @@ class TaskCreateCommand {
 
     Long process(CreateTaskDto createTaskDto) {
         Task t = new Task();
-        TaskDomainModel taskDomainModel = new TaskDomainModel(t);
+        TaskDomainModel task = new TaskDomainModel(t);
         t.setTitle(createTaskDto.getTitle());
         t.setDescription(createTaskDto.getDescription());
         t.setStatus(ToDoItemStatus.valueOf(createTaskDto.getStatus()));
@@ -31,23 +31,24 @@ class TaskCreateCommand {
             if (found.isEmpty()) {
                 throw new OwnerDomainModelNotFoundException(createTaskDto.getOwnerId());
             } else {
-                taskDomainModel.setOwner(found.get());
+                task.setOwner(found.get());
             }
         }
 
         if (createTaskDto.hasStoryId()) {
-            Story str;
-            if (!storyRepository.existsById(createTaskDto.getStoryId())) {
+            Optional<Story> foundStory = storyRepository.findById(createTaskDto.getStoryId());
+            Optional<StoryDomainModel> found = foundStory.map(StoryDomainModel::new);
+
+            if (found.isEmpty()) {
                 throw new StoryDomainModelNotFoundException(createTaskDto.getStoryId());
             }
 
-            str = storyRepository.findById(createTaskDto.getStoryId()).get();
+            StoryDomainModel story = found.get();
+            task.setStory(story);
 
-            t.setStory(str);
-            str.addTask(t);
-            storyRepository.save(str);
+            storyRepository.save(story.asStory());
         }
 
-        return taskDomainModelRepository.create(taskDomainModel);
+        return taskDomainModelRepository.create(task);
     }
 }

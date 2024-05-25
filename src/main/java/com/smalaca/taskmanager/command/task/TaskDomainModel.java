@@ -2,6 +2,7 @@ package com.smalaca.taskmanager.command.task;
 
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
+import com.smalaca.taskamanager.model.entities.Story;
 import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 
@@ -57,5 +58,11 @@ public class TaskDomainModel {
 
     void setOwner(OwnerDomainModel ownerDomainModel) {
         task.setOwner(ownerDomainModel.toOwner());
+    }
+
+    void setStory(StoryDomainModel story) {
+        Story legacyStory = story.asStory();
+        task.setStory(legacyStory);
+        legacyStory.addTask(task);
     }
 }
