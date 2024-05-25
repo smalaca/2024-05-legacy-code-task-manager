@@ -1,5 +1,6 @@
 package com.smalaca.taskamanager.dto;
 
+import com.smalaca.taskmanager.command.task.CreateTaskDto;
 import com.smalaca.taskmanager.command.task.UpdateTaskDto;
 
 import java.util.List;
@@ -142,5 +143,15 @@ public class TaskDto {
                 ownerPhoneNumberNumber,
                 ownerPhoneNumberPrefix,
                 ownerEmailAddress);
+    }
+
+    public CreateTaskDto asCreateTaskDto() {
+        return new CreateTaskDto(
+                title,
+                description,
+                status,
+                ownerId,
+                storyId
+        );
     }
 }

@@ -1,6 +1,5 @@
 package com.smalaca.taskmanager.command.task;
 
-import com.smalaca.taskamanager.dto.TaskDto;
 import com.smalaca.taskamanager.dto.WatcherDto;
 import com.smalaca.taskamanager.exception.TaskDoesNotExistException;
 import com.smalaca.taskamanager.exception.UserNotFoundException;
@@ -36,8 +35,8 @@ public class TaskCommandApi {
         taskDeleteCommand = new TaskDeleteCommand(taskDomainModelRepository);
     }
 
-    public Long create(TaskDto dto) {
-        return taskCreateCommand.process(dto);
+    public Long create(CreateTaskDto createTaskDto) {
+        return taskCreateCommand.process(createTaskDto);
     }
 
     public CommandStatus update(UpdateTaskDto updateTaskDto) {

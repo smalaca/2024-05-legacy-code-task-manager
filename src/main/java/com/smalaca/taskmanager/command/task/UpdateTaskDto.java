@@ -1,10 +1,10 @@
 package com.smalaca.taskmanager.command.task;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 
-@Getter
-public
-class UpdateTaskDto {
+@Getter(AccessLevel.PACKAGE)
+public class UpdateTaskDto {
     private final Long taskId;
     private final String status;
     private final String description;

@@ -76,7 +76,7 @@ public class TaskController {
     @PostMapping
     public ResponseEntity<Long> create(@RequestBody TaskDto dto) {
         try {
-            Long taskId = taskCommandApi.create(dto);
+            Long taskId = taskCommandApi.create(dto.asCreateTaskDto());
             return ResponseEntity.ok(taskId);
         } catch (StoryDomainModelNotFoundException | OwnerDomainModelNotFoundException exception) {
             return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);

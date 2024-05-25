@@ -1,6 +1,5 @@
 package com.smalaca.taskmanager.command.task;
 
-import com.smalaca.taskamanager.dto.TaskDto;
 import com.smalaca.taskamanager.model.entities.Story;
 import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
@@ -19,30 +18,30 @@ class TaskCreateCommand {
         this.storyRepository = storyRepository;
     }
 
-    Long process(TaskDto dto) {
+    Long process(CreateTaskDto createTaskDto) {
         Task t = new Task();
         TaskDomainModel taskDomainModel = new TaskDomainModel(t);
-        t.setTitle(dto.getTitle());
-        t.setDescription(dto.getDescription());
-        t.setStatus(ToDoItemStatus.valueOf(dto.getStatus()));
+        t.setTitle(createTaskDto.getTitle());
+        t.setDescription(createTaskDto.getDescription());
+        t.setStatus(ToDoItemStatus.valueOf(createTaskDto.getStatus()));
 
-        if (dto.getOwnerId() != null) {
-            Optional<OwnerDomainModel> found = ownerDomainModelRepository.findById(dto.getOwnerId());
+        if (createTaskDto.getOwnerId() != null) {
+            Optional<OwnerDomainModel> found = ownerDomainModelRepository.findById(createTaskDto.getOwnerId());
 
             if (found.isEmpty()) {
-                throw new OwnerDomainModelNotFoundException(dto.getOwnerId());
+                throw new OwnerDomainModelNotFoundException(createTaskDto.getOwnerId());
             } else {
                 taskDomainModel.setOwner(found.get());
             }
         }
 
-        if (dto.getStoryId() != null) {
+        if (createTaskDto.getStoryId() != null) {
             Story str;
-            if (!storyRepository.existsById(dto.getStoryId())) {
-                throw new StoryDomainModelNotFoundException(dto.getStoryId());
+            if (!storyRepository.existsById(createTaskDto.getStoryId())) {
+                throw new StoryDomainModelNotFoundException(createTaskDto.getStoryId());
             }
 
-            str = storyRepository.findById(dto.getStoryId()).get();
+            str = storyRepository.findById(createTaskDto.getStoryId()).get();
 
             t.setStory(str);
             str.addTask(t);
