@@ -5,12 +5,12 @@ import java.util.Optional;
 class TaskUpdateCommand {
     private final TaskDomainModelRepository taskDomainModelRepository;
     private final OwnerDomainModelRepository ownerDomainModelRepository;
-    private final TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer;
+    private final StatusChangeService statusChangeService;
 
-    TaskUpdateCommand(TaskDomainModelRepository taskDomainModelRepository, OwnerDomainModelRepository ownerDomainModelRepository, TaskUpdateAntiCorruptionLayer taskUpdateAntiCorruptionLayer) {
+    TaskUpdateCommand(TaskDomainModelRepository taskDomainModelRepository, OwnerDomainModelRepository ownerDomainModelRepository, StatusChangeService statusChangeService) {
         this.taskDomainModelRepository = taskDomainModelRepository;
         this.ownerDomainModelRepository = ownerDomainModelRepository;
-        this.taskUpdateAntiCorruptionLayer = taskUpdateAntiCorruptionLayer;
+        this.statusChangeService = statusChangeService;
     }
 
     UpdateStatus process(UpdateTaskDto dto) {
@@ -29,7 +29,7 @@ class TaskUpdateCommand {
         }
 
         if (taskDomainModel.changeStatusIfNeeded(dto)) {
-            taskUpdateAntiCorruptionLayer.processTask(taskDomainModel.getId());
+            statusChangeService.processTask(taskDomainModel.getId());
         }
 
         if (taskDomainModel.hasOwner()) {

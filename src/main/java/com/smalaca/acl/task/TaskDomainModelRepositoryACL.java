@@ -1,33 +1,17 @@
 package com.smalaca.acl.task;
 
 import com.smalaca.taskamanager.model.entities.Task;
-import com.smalaca.taskamanager.model.entities.User;
 import com.smalaca.taskamanager.repository.TaskRepository;
-import com.smalaca.taskamanager.repository.UserRepository;
-import com.smalaca.taskamanager.service.ToDoItemService;
-import com.smalaca.taskmanager.command.task.OwnerDomainModel;
 import com.smalaca.taskmanager.command.task.TaskDomainModel;
 import com.smalaca.taskmanager.command.task.TaskDomainModelRepository;
-import com.smalaca.taskmanager.command.task.TaskUpdateAntiCorruptionLayer;
 
 import java.util.Optional;
 
-import static com.smalaca.taskmanager.command.task.OwnerDomainModel.Builder.owner;
-
-public class TaskAntiCorruptionLayer implements TaskUpdateAntiCorruptionLayer, TaskDomainModelRepository {
-    private final ToDoItemService toDoItemService;
-    private final UserRepository userRepository;
+public class TaskDomainModelRepositoryACL implements TaskDomainModelRepository {
     private final TaskRepository taskRepository;
 
-    public TaskAntiCorruptionLayer(ToDoItemService toDoItemService, UserRepository userRepository, TaskRepository taskRepository) {
-        this.toDoItemService = toDoItemService;
-        this.userRepository = userRepository;
+    public TaskDomainModelRepositoryACL(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
-    }
-
-    @Override
-    public void processTask(Long id) {
-        toDoItemService.processTask(id);
     }
 
     @Override

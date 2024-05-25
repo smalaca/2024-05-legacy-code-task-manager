@@ -1,5 +1,5 @@
 package com.smalaca.taskmanager.command.task;
 
-public interface TaskUpdateAntiCorruptionLayer {
+public interface StatusChangeService {
     void processTask(Long id);
 }
