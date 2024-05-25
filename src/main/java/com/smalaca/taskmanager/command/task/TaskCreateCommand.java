@@ -1,7 +1,6 @@
 package com.smalaca.taskmanager.command.task;
 
 import com.smalaca.taskamanager.dto.TaskDto;
-import com.smalaca.taskamanager.exception.ProjectNotFoundException;
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.Owner;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
@@ -62,7 +61,7 @@ class TaskCreateCommand {
         if (dto.getStoryId() != null) {
             Story str;
             if (!storyRepository.existsById(dto.getStoryId())) {
-                throw new ProjectNotFoundException();
+                throw new StoryDomainModelNotFoundException(dto.getStoryId());
             }
 
             str = storyRepository.findById(dto.getStoryId()).get();
