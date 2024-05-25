@@ -15,13 +15,19 @@ public class TaskDomainModelRepositoryACL implements TaskDomainModelRepository {
     }
 
     @Override
+    public Long create(TaskDomainModel taskDomainModel) {
+        Task saved = taskRepository.save(taskDomainModel.asTask());
+        return saved.getId();
+    }
+
+    @Override
     public Optional<TaskDomainModel> findById(Long taskId) {
         Optional<Task> found = taskRepository.findById(taskId);
         return found.map(TaskDomainModel::new);
     }
 
     @Override
-    public void save(TaskDomainModel taskDomainModel) {
+    public void update(TaskDomainModel taskDomainModel) {
         taskRepository.save(taskDomainModel.asTask());
     }
 

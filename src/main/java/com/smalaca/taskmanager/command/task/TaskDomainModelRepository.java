@@ -8,5 +8,7 @@ public interface TaskDomainModelRepository {
 
     Optional<TaskDomainModel> findById(Long taskId);
 
-    void save(TaskDomainModel taskDomainModel);
+    void update(TaskDomainModel taskDomainModel);
+
+    Long create(TaskDomainModel taskDomainModel);
 }

@@ -10,20 +10,19 @@ import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.model.entities.User;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 import com.smalaca.taskamanager.repository.StoryRepository;
-import com.smalaca.taskamanager.repository.TaskRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
 
 import java.util.Optional;
 
 class TaskCreateCommand {
+    private final TaskDomainModelRepository taskDomainModelRepository;
     private final UserRepository userRepository;
     private final StoryRepository storyRepository;
-    private final TaskRepository taskRepository;
 
-    TaskCreateCommand(UserRepository userRepository, StoryRepository storyRepository, TaskRepository taskRepository) {
+    TaskCreateCommand(TaskDomainModelRepository taskDomainModelRepository, UserRepository userRepository, StoryRepository storyRepository) {
+        this.taskDomainModelRepository = taskDomainModelRepository;
         this.userRepository = userRepository;
         this.storyRepository = storyRepository;
-        this.taskRepository = taskRepository;
     }
 
     Long process(TaskDto dto) {
@@ -73,8 +72,6 @@ class TaskCreateCommand {
             storyRepository.save(str);
         }
 
-        Task saved = taskRepository.save(t);
-
-        return saved.getId();
+        return taskDomainModelRepository.create(new TaskDomainModel(t));
     }
 }

@@ -46,7 +46,7 @@ class TaskUpdateCommand {
             }
         }
 
-        taskDomainModelRepository.save(taskDomainModel);
+        taskDomainModelRepository.update(taskDomainModel);
 
         return CommandStatus.SUCCESS;
     }
