@@ -1,10 +1,9 @@
 package com.smalaca.taskamanager.api.rest;
 
 
-import com.smalaca.acl.story.StoryDomainModelRepositoryACL;
 import com.smalaca.acl.owner.OwnerDomainModelRepositoryACL;
+import com.smalaca.acl.story.StoryDomainModelRepositoryACL;
 import com.smalaca.acl.task.StatusChangeServiceACL;
-import com.smalaca.acl.task.TaskDomainModelRepositoryACL;
 import com.smalaca.acl.watcher.WatcherDomainModelRepositoryACL;
 import com.smalaca.taskamanager.dto.AssigneeDto;
 import com.smalaca.taskamanager.dto.StakeholderDto;
@@ -26,9 +25,9 @@ import com.smalaca.taskamanager.repository.TaskRepository;
 import com.smalaca.taskamanager.repository.TeamRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
 import com.smalaca.taskamanager.service.ToDoItemService;
+import com.smalaca.taskmanager.command.owner.OwnerDomainModelNotFoundException;
 import com.smalaca.taskmanager.command.task.AddTaskWatcherDto;
 import com.smalaca.taskmanager.command.task.CommandStatus;
-import com.smalaca.taskmanager.command.owner.OwnerDomainModelNotFoundException;
 import com.smalaca.taskmanager.command.task.StoryDomainModelNotFoundException;
 import com.smalaca.taskmanager.command.task.TaskCommandApi;
 import com.smalaca.taskmanager.command.task.TaskDomainModelDoesNotExistException;
@@ -47,6 +46,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
+
+import static com.smalaca.acl.task.TaskDomainModelRepositoryACL.taskDomainModelRepositoryACL;
 
 @RestController
 @RequestMapping("/task")
@@ -67,7 +68,7 @@ public class TaskController {
         taskQueryApi = new TaskQueryApi(taskRepository);
         taskCommandApi = new TaskCommandApi(
                 new StatusChangeServiceACL(toDoItemService),
-                new TaskDomainModelRepositoryACL(taskRepository, storyRepository),
+                taskDomainModelRepositoryACL(taskRepository, storyRepository),
                 new OwnerDomainModelRepositoryACL(userRepository),
                 new StoryDomainModelRepositoryACL(storyRepository),
                 new WatcherDomainModelRepositoryACL(userRepository));
