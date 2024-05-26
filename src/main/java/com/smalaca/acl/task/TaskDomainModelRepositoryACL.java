@@ -9,13 +9,20 @@ import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 import com.smalaca.taskamanager.repository.StoryRepository;
 import com.smalaca.taskamanager.repository.TaskRepository;
+import com.smalaca.taskmanager.command.owner.OwnerDomainModel;
 import com.smalaca.taskmanager.command.owner.OwnerReadModel;
 import com.smalaca.taskmanager.command.task.TaskDomainModel;
 import com.smalaca.taskmanager.command.task.TaskDomainModelRepository;
 import com.smalaca.taskmanager.command.task.TaskReadModel;
+import com.smalaca.taskmanager.command.watcher.WatcherDomainModel;
 import com.smalaca.taskmanager.command.watcher.WatcherReadModel;
 
+import java.util.List;
 import java.util.Optional;
+
+import static com.smalaca.taskmanager.command.owner.OwnerDomainModel.Builder.owner;
+import static com.smalaca.taskmanager.command.watcher.WatcherDomainModel.Builder.watcher;
+import static java.util.stream.Collectors.toList;
 
 public class TaskDomainModelRepositoryACL implements TaskDomainModelRepository {
     private final TaskRepository taskRepository;
@@ -68,7 +75,45 @@ public class TaskDomainModelRepositoryACL implements TaskDomainModelRepository {
     @Override
     public Optional<TaskDomainModel> findById(Long taskId) {
         Optional<Task> found = taskRepository.findById(taskId);
-        return found.map(TaskDomainModel::new);
+        return found.map(task -> asTaskDomainModel(task));
+    }
+
+    private TaskDomainModel asTaskDomainModel(Task task) {
+        OwnerDomainModel owner = task.getOwner() == null ? null : asOwner(task.getOwner());
+        List<WatcherDomainModel> watchers = task.getWatchers().stream()
+                .map(this::asWatcher)
+                .collect(toList());
+
+        return new TaskDomainModel(
+                task.getId(), task.getTitle(), task.getDescription(), task.getStatus().name(), owner, watchers);
+    }
+
+    private OwnerDomainModel asOwner(Owner owner) {
+        OwnerDomainModel.Builder builder = owner(owner.getFirstName(), owner.getLastName());
+
+        if (owner.getPhoneNumber() != null) {
+            builder.withPhoneNumber(owner.getPhoneNumber().getNumber(), owner.getPhoneNumber().getPrefix());
+        }
+
+        if (owner.getEmailAddress() != null) {
+            builder.withEmailAddress(owner.getEmailAddress().getEmailAddress());
+        }
+
+        return builder.build();
+    }
+
+    private WatcherDomainModel asWatcher(Watcher watcher) {
+        WatcherDomainModel.Builder builder = watcher(watcher.getFirstName(), watcher.getLastName());
+
+        if (watcher.getPhoneNumber() != null) {
+            builder.withPhoneNumber(watcher.getPhoneNumber().getNumber(), watcher.getPhoneNumber().getPrefix());
+        }
+
+        if (watcher.getEmailAddress() != null) {
+            builder.withEmailAddress(watcher.getEmailAddress().getEmailAddress());
+        }
+
+        return builder.build();
     }
 
     @Override
