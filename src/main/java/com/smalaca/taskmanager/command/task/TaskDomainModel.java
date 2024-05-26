@@ -4,7 +4,6 @@ import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.Owner;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
 import com.smalaca.taskamanager.model.embedded.Watcher;
-import com.smalaca.taskamanager.model.entities.Story;
 import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 import com.smalaca.taskmanager.command.owner.OwnerDomainModel;
@@ -18,15 +17,17 @@ import java.util.List;
 
 import static com.smalaca.taskmanager.command.owner.OwnerDomainModel.Builder.owner;
 import static com.smalaca.taskmanager.command.watcher.WatcherDomainModel.Builder.watcher;
+import static java.util.stream.Collectors.toList;
 
 public class TaskDomainModel {
-    private final Task task;
+    private Task task;
     private Long taskId;
     private final String title;
     private String description;
     private String status;
     private OwnerDomainModel owner;
     private final List<WatcherDomainModel> watchers = new ArrayList<>();
+    private StoryDomainModel story;
 
     public TaskDomainModel(Task task) {
         this.task = task;
@@ -72,7 +73,6 @@ public class TaskDomainModel {
         this.title = title;
         this.description = description;
         this.status = status;
-        task = new Task();
     }
 
     Long getId() {
@@ -119,9 +119,16 @@ public class TaskDomainModel {
     }
 
     void setStory(StoryDomainModel story) {
-        Story legacyStory = story.asStory();
-        task.setStory(legacyStory);
-        legacyStory.addTask(task);
+        this.story = story;
+    }
+
+    public TaskReadModel asReadModel() {
+        OwnerReadModel owner = hasOwner() ? this.owner.asReadModel() : null;
+        List<WatcherReadModel> watchers = this.watchers.stream()
+                .map(WatcherDomainModel::asReadModel)
+                .collect(toList());
+        Long storyId = story == null ? null : story.getId();
+        return new TaskReadModel(taskId, storyId, title, description, status, owner, watchers);
     }
 
     public Task asTask() {

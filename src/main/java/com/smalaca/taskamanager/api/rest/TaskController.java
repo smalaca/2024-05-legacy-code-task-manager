@@ -67,7 +67,7 @@ public class TaskController {
         taskQueryApi = new TaskQueryApi(taskRepository);
         taskCommandApi = new TaskCommandApi(
                 new StatusChangeServiceACL(toDoItemService),
-                new TaskDomainModelRepositoryACL(taskRepository),
+                new TaskDomainModelRepositoryACL(taskRepository, storyRepository),
                 new OwnerDomainModelRepositoryACL(userRepository),
                 new StoryDomainModelRepositoryACL(storyRepository),
                 new WatcherDomainModelRepositoryACL(userRepository));

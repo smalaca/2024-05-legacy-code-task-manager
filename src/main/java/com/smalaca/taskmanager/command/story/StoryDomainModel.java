@@ -9,6 +9,10 @@ public class StoryDomainModel {
         this.story = story;
     }
 
+    public Long getId() {
+        return story.getId();
+    }
+
     public Story asStory() {
         return story;
     }
