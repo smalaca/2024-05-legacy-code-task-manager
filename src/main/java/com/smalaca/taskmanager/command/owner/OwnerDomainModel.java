@@ -3,9 +3,9 @@ package com.smalaca.taskmanager.command.owner;
 public class OwnerDomainModel {
     private final String firstName;
     private final String lastName;
-    private final String phoneNumber;
-    private final String phonePrefix;
-    private final String emailAddress;
+    private String phoneNumber;
+    private String phonePrefix;
+    private String emailAddress;
 
     private OwnerDomainModel(Builder builder) {
         this.firstName = builder.firstName;
@@ -17,6 +17,15 @@ public class OwnerDomainModel {
 
     public OwnerReadModel asReadModel() {
         return new OwnerReadModel(firstName, lastName, phoneNumber, phonePrefix, emailAddress);
+    }
+
+    public void changePhoneNumber(String phonePrefix, String phoneNumber) {
+        this.phonePrefix = phonePrefix;
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void changeEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
     }
 
     public static class Builder {

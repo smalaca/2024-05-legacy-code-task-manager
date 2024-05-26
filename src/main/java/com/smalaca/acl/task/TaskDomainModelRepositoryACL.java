@@ -21,14 +21,14 @@ public class TaskDomainModelRepositoryACL implements TaskDomainModelRepository {
     }
 
     @Override
-    public Optional<TaskDomainModel> findById(Long taskId) {
-        Optional<Task> found = taskRepository.findById(taskId);
-        return found.map(TaskDomainModel::new);
+    public void update(TaskDomainModel taskDomainModel) {
+        taskRepository.save(taskDomainModel.asTask());
     }
 
     @Override
-    public void update(TaskDomainModel taskDomainModel) {
-        taskRepository.save(taskDomainModel.asTask());
+    public Optional<TaskDomainModel> findById(Long taskId) {
+        Optional<Task> found = taskRepository.findById(taskId);
+        return found.map(TaskDomainModel::new);
     }
 
     @Override
