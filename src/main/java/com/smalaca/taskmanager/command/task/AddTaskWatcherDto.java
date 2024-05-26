@@ -1,8 +1,9 @@
 package com.smalaca.taskmanager.command.task;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 
-@Getter
+@Getter(AccessLevel.PACKAGE)
 public class AddTaskWatcherDto {
     private final Long taskId;
     private final Long watcherId;

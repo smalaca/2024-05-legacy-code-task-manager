@@ -1,11 +1,13 @@
 package com.smalaca.taskmanager.command.task;
 
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
+import com.smalaca.taskamanager.model.embedded.Owner;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
 import com.smalaca.taskamanager.model.entities.Story;
 import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 import com.smalaca.taskmanager.command.owner.OwnerDomainModel;
+import com.smalaca.taskmanager.command.owner.OwnerReadModel;
 import com.smalaca.taskmanager.command.story.StoryDomainModel;
 import com.smalaca.taskmanager.command.watcher.WatcherDomainModel;
 
@@ -67,7 +69,33 @@ public class TaskDomainModel {
     }
 
     void setOwner(OwnerDomainModel ownerDomainModel) {
-        task.setOwner(ownerDomainModel.toOwner());
+        task.setOwner(asOwner(ownerDomainModel.asReadModel()));
+    }
+
+    public Owner asOwner(OwnerReadModel ownerReadModel) {
+        Owner owner = new Owner();
+        owner.setFirstName(ownerReadModel.getFirstName());
+        owner.setLastName(ownerReadModel.getLastName());
+        if (ownerReadModel.getEmailAddress() != null) {
+            owner.setEmailAddress(asEmailAddress(ownerReadModel.getEmailAddress()));
+        }
+        if (ownerReadModel.getPhoneNumber() != null) {
+            owner.setPhoneNumber(asPhoneNumber(ownerReadModel.getPhonePrefix(), ownerReadModel.getPhoneNumber()));
+        }
+        return owner;
+    }
+
+    private PhoneNumber asPhoneNumber(String prefix, String number) {
+        PhoneNumber phoneNumber = new PhoneNumber();
+        phoneNumber.setNumber(number);
+        phoneNumber.setPrefix(prefix);
+        return phoneNumber;
+    }
+
+    private EmailAddress asEmailAddress(String email) {
+        EmailAddress emailAddress = new EmailAddress();
+        emailAddress.setEmailAddress(email);
+        return emailAddress;
     }
 
     void setStory(StoryDomainModel story) {

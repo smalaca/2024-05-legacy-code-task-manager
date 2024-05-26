@@ -1,9 +1,5 @@
 package com.smalaca.taskmanager.command.owner;
 
-import com.smalaca.taskamanager.model.embedded.EmailAddress;
-import com.smalaca.taskamanager.model.embedded.Owner;
-import com.smalaca.taskamanager.model.embedded.PhoneNumber;
-
 public class OwnerDomainModel {
     private final String firstName;
     private final String lastName;
@@ -19,30 +15,8 @@ public class OwnerDomainModel {
         this.emailAddress = builder.emailAddress;
     }
 
-    public Owner toOwner() {
-        Owner owner = new Owner();
-        owner.setLastName(lastName);
-        owner.setFirstName(firstName);
-        if (emailAddress != null) {
-            owner.setEmailAddress(toEmailAddress());
-        }
-        if (phoneNumber != null) {
-            owner.setPhoneNumber(toPhoneNumber());
-        }
-        return owner;
-    }
-
-    private PhoneNumber toPhoneNumber() {
-        PhoneNumber phoneNumber = new PhoneNumber();
-        phoneNumber.setNumber(this.phoneNumber);
-        phoneNumber.setPrefix(this.phonePrefix);
-        return phoneNumber;
-    }
-
-    private EmailAddress toEmailAddress() {
-        EmailAddress emailAddress = new EmailAddress();
-        emailAddress.setEmailAddress(this.emailAddress);
-        return emailAddress;
+    public OwnerReadModel asReadModel() {
+        return new OwnerReadModel(firstName, lastName, phoneNumber, phonePrefix, emailAddress);
     }
 
     public static class Builder {
