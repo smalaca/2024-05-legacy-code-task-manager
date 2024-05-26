@@ -1,11 +1,8 @@
 package com.smalaca.taskmanager.command.task;
 
-import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.Owner;
-import com.smalaca.taskamanager.model.embedded.PhoneNumber;
 import com.smalaca.taskamanager.model.embedded.Watcher;
 import com.smalaca.taskamanager.model.entities.Task;
-import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 import com.smalaca.taskmanager.command.owner.OwnerDomainModel;
 import com.smalaca.taskmanager.command.owner.OwnerReadModel;
 import com.smalaca.taskmanager.command.story.StoryDomainModel;
@@ -20,7 +17,6 @@ import static com.smalaca.taskmanager.command.watcher.WatcherDomainModel.Builder
 import static java.util.stream.Collectors.toList;
 
 public class TaskDomainModel {
-    private Task task;
     private Long taskId;
     private final String title;
     private String description;
@@ -30,7 +26,6 @@ public class TaskDomainModel {
     private StoryDomainModel story;
 
     public TaskDomainModel(Task task) {
-        this.task = task;
         this.taskId = task.getId();
         this.title = task.getTitle();
         this.description = task.getDescription();
@@ -129,60 +124,5 @@ public class TaskDomainModel {
                 .collect(toList());
         Long storyId = story == null ? null : story.getId();
         return new TaskReadModel(taskId, storyId, title, description, status, owner, watchers);
-    }
-
-    public Task asTask() {
-        task.setTitle(title);
-        task.setDescription(description);
-        task.setStatus(ToDoItemStatus.valueOf(status));
-
-        if (owner != null) {
-            task.setOwner(asOwner(owner.asReadModel()));
-        }
-
-        watchers.forEach(watcher -> {
-            task.addWatcher(asWatcher(watcher.asReadModel()));
-        });
-
-        return task;
-    }
-
-    private Watcher asWatcher(WatcherReadModel readModel) {
-        Watcher watcher = new Watcher();
-        watcher.setFirstName(readModel.getFirstName());
-        watcher.setLastName(readModel.getLastName());
-        if (readModel.getEmailAddress() != null) {
-            watcher.setEmailAddress(asEmailAddress(readModel.getEmailAddress()));
-        }
-        if (readModel.getPhoneNumber() != null) {
-            watcher.setPhoneNumber(asPhoneNumber(readModel.getPhonePrefix(), readModel.getPhoneNumber()));
-        }
-        return watcher;
-    }
-
-    public Owner asOwner(OwnerReadModel readModel) {
-        Owner owner = new Owner();
-        owner.setFirstName(readModel.getFirstName());
-        owner.setLastName(readModel.getLastName());
-        if (readModel.getEmailAddress() != null) {
-            owner.setEmailAddress(asEmailAddress(readModel.getEmailAddress()));
-        }
-        if (readModel.getPhoneNumber() != null) {
-            owner.setPhoneNumber(asPhoneNumber(readModel.getPhonePrefix(), readModel.getPhoneNumber()));
-        }
-        return owner;
-    }
-
-    private PhoneNumber asPhoneNumber(String prefix, String number) {
-        PhoneNumber phoneNumber = new PhoneNumber();
-        phoneNumber.setNumber(number);
-        phoneNumber.setPrefix(prefix);
-        return phoneNumber;
-    }
-
-    private EmailAddress asEmailAddress(String email) {
-        EmailAddress emailAddress = new EmailAddress();
-        emailAddress.setEmailAddress(email);
-        return emailAddress;
     }
 }

@@ -35,7 +35,11 @@ public class TaskDomainModelRepositoryACL implements TaskDomainModelRepository {
 
     @Override
     public void update(TaskDomainModel taskDomainModel) {
-        taskRepository.save(taskDomainModel.asTask());
+        TaskReadModel readModel = taskDomainModel.asReadModel();
+        Task found = taskRepository.findById(readModel.getTaskId()).get();
+        Task task = mapFromTo(readModel, found);
+
+        taskRepository.save(task);
     }
 
     private Task mapFromTo(TaskReadModel taskReadModel, Task task) {
