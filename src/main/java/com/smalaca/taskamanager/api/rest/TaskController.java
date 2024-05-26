@@ -26,6 +26,7 @@ import com.smalaca.taskamanager.repository.TaskRepository;
 import com.smalaca.taskamanager.repository.TeamRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
 import com.smalaca.taskamanager.service.ToDoItemService;
+import com.smalaca.taskmanager.command.task.AddTaskWatcherDto;
 import com.smalaca.taskmanager.command.task.CommandStatus;
 import com.smalaca.taskmanager.command.owner.OwnerDomainModelNotFoundException;
 import com.smalaca.taskmanager.command.story.StoryDomainModelNotFoundException;
@@ -116,7 +117,7 @@ public class TaskController {
     @PutMapping("/{id}/watcher")
     public ResponseEntity<Void> addWatcher(@PathVariable long id, @RequestBody WatcherDto dto) {
         try {
-            taskCommandApi.addWatcher(id, dto);
+            taskCommandApi.addWatcher(new AddTaskWatcherDto(id, dto.getId()));
             return ResponseEntity.ok().build();
         } catch (TaskDomainModelDoesNotExistException exception) {
             return ResponseEntity.notFound().build();

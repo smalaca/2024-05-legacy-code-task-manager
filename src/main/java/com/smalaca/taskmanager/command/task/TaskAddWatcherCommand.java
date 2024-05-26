@@ -1,6 +1,5 @@
 package com.smalaca.taskmanager.command.task;
 
-import com.smalaca.taskamanager.dto.WatcherDto;
 import com.smalaca.taskmanager.command.watcher.WatcherDomainModel;
 import com.smalaca.taskmanager.command.watcher.WatcherDomainModelNotFoundException;
 import com.smalaca.taskmanager.command.watcher.WatcherDomainModelRepository;
@@ -16,18 +15,18 @@ class TaskAddWatcherCommand {
         this.watcherRepository = watcherRepository;
     }
 
-    void process(long id, WatcherDto dto) {
-        Optional<TaskDomainModel> found = taskRepository.findById(id);
+    void process(AddTaskWatcherDto dto) {
+        Optional<TaskDomainModel> found = taskRepository.findById(dto.getTaskId());
 
         if (found.isEmpty()) {
-            throw new TaskDomainModelDoesNotExistException(id);
+            throw new TaskDomainModelDoesNotExistException(dto.getTaskId());
         }
 
         update(found.get(), dto);
     }
 
-    private void update(TaskDomainModel taskDomainModel, WatcherDto dto) {
-        WatcherDomainModel watcher = findUserBy(dto.getId());
+    private void update(TaskDomainModel taskDomainModel, AddTaskWatcherDto dto) {
+        WatcherDomainModel watcher = findUserBy(dto.getWatcherId());
         taskDomainModel.addWatcher(watcher);
 
         taskRepository.update(taskDomainModel);

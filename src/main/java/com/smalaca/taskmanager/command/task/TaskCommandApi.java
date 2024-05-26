@@ -1,6 +1,5 @@
 package com.smalaca.taskmanager.command.task;
 
-import com.smalaca.taskamanager.dto.WatcherDto;
 import com.smalaca.taskmanager.command.owner.OwnerDomainModelRepository;
 import com.smalaca.taskmanager.command.story.StoryDomainModelRepository;
 import com.smalaca.taskmanager.command.watcher.WatcherDomainModelRepository;
@@ -33,7 +32,7 @@ public class TaskCommandApi {
         return taskDeleteCommand.process(id);
     }
 
-    public void addWatcher(long id, WatcherDto dto) {
-        taskAddWatcherCommand.process(id, dto);
+    public void addWatcher(AddTaskWatcherDto dto) {
+        taskAddWatcherCommand.process(dto);
     }
 }
