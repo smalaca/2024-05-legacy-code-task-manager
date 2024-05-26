@@ -2,8 +2,8 @@ package com.smalaca.acl;
 
 import com.smalaca.taskamanager.model.entities.Story;
 import com.smalaca.taskamanager.repository.StoryRepository;
-import com.smalaca.taskmanager.command.task.StoryDomainModel;
-import com.smalaca.taskmanager.command.task.StoryDomainModelRepository;
+import com.smalaca.taskmanager.command.story.StoryDomainModel;
+import com.smalaca.taskmanager.command.story.StoryDomainModelRepository;
 
 import java.util.Optional;
 

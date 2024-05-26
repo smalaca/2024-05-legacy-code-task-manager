@@ -1,4 +1,4 @@
-package com.smalaca.taskmanager.command.task;
+package com.smalaca.taskmanager.command.story;
 
 import java.util.Optional;
 

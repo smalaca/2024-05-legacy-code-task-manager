@@ -1,9 +1,9 @@
-package com.smalaca.taskmanager.command.task;
+package com.smalaca.taskmanager.command.story;
 
 public class StoryDomainModelNotFoundException extends RuntimeException {
     private final Long storyId;
 
-    StoryDomainModelNotFoundException(Long storyId) {
+    public StoryDomainModelNotFoundException(Long storyId) {
         this.storyId = storyId;
     }
 }

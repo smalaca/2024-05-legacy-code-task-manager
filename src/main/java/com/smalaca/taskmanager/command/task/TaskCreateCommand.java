@@ -1,5 +1,9 @@
 package com.smalaca.taskmanager.command.task;
 
+import com.smalaca.taskmanager.command.story.StoryDomainModel;
+import com.smalaca.taskmanager.command.story.StoryDomainModelNotFoundException;
+import com.smalaca.taskmanager.command.story.StoryDomainModelRepository;
+
 import java.util.Optional;
 
 class TaskCreateCommand {
