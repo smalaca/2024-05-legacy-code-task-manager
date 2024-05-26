@@ -76,7 +76,7 @@ public class TaskDomainModel {
         legacyStory.addTask(task);
     }
 
-    void addWatcher(WatcherDomainModel.Builder watcher) {
-        task.addWatcher(watcher.build().toWatcher());
+    void addWatcher(WatcherDomainModel watcher) {
+        task.addWatcher(watcher.toWatcher());
     }
 }

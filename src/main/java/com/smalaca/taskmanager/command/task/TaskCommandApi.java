@@ -1,10 +1,9 @@
 package com.smalaca.taskmanager.command.task;
 
 import com.smalaca.taskamanager.dto.WatcherDto;
-import com.smalaca.taskamanager.repository.TaskRepository;
-import com.smalaca.taskamanager.repository.UserRepository;
 import com.smalaca.taskmanager.command.owner.OwnerDomainModelRepository;
 import com.smalaca.taskmanager.command.story.StoryDomainModelRepository;
+import com.smalaca.taskmanager.command.watcher.WatcherDomainModelRepository;
 
 public class TaskCommandApi {
     private final TaskCreateCommand taskCreateCommand;
@@ -13,13 +12,13 @@ public class TaskCommandApi {
     private final TaskAddWatcherCommand taskAddWatcherCommand;
 
     public TaskCommandApi(
-            UserRepository userRepository, TaskRepository taskRepository,
-            StatusChangeService statusChangeService, TaskDomainModelRepository taskDomainModelRepository,
-            OwnerDomainModelRepository ownerDomainModelRepository, StoryDomainModelRepository storyDomainModelRepository) {
-        taskCreateCommand = new TaskCreateCommand(taskDomainModelRepository, ownerDomainModelRepository, storyDomainModelRepository);
-        taskUpdateCommand = new TaskUpdateCommand(taskDomainModelRepository, ownerDomainModelRepository, statusChangeService);
-        taskDeleteCommand = new TaskDeleteCommand(taskDomainModelRepository);
-        taskAddWatcherCommand = new TaskAddWatcherCommand(taskDomainModelRepository, userRepository);
+            StatusChangeService statusChangeService, TaskDomainModelRepository taskRepository,
+            OwnerDomainModelRepository ownerRepository, StoryDomainModelRepository storyRepository,
+            WatcherDomainModelRepository watcherRepository) {
+        taskCreateCommand = new TaskCreateCommand(taskRepository, ownerRepository, storyRepository);
+        taskUpdateCommand = new TaskUpdateCommand(taskRepository, ownerRepository, statusChangeService);
+        taskDeleteCommand = new TaskDeleteCommand(taskRepository);
+        taskAddWatcherCommand = new TaskAddWatcherCommand(taskRepository, watcherRepository);
     }
 
     public Long create(CreateTaskDto createTaskDto) {

@@ -1,22 +1,19 @@
 package com.smalaca.taskmanager.command.task;
 
 import com.smalaca.taskamanager.dto.WatcherDto;
-import com.smalaca.taskamanager.exception.UserNotFoundException;
-import com.smalaca.taskamanager.model.entities.User;
-import com.smalaca.taskamanager.repository.UserRepository;
 import com.smalaca.taskmanager.command.watcher.WatcherDomainModel;
+import com.smalaca.taskmanager.command.watcher.WatcherDomainModelNotFoundException;
+import com.smalaca.taskmanager.command.watcher.WatcherDomainModelRepository;
 
 import java.util.Optional;
 
-import static com.smalaca.taskmanager.command.watcher.WatcherDomainModel.Builder.watcher;
-
 class TaskAddWatcherCommand {
     private final TaskDomainModelRepository taskRepository;
-    private final UserRepository userRepository;
+    private final WatcherDomainModelRepository watcherRepository;
 
-    TaskAddWatcherCommand(TaskDomainModelRepository taskRepository, UserRepository userRepository) {
+    TaskAddWatcherCommand(TaskDomainModelRepository taskRepository, WatcherDomainModelRepository watcherRepository) {
         this.taskRepository = taskRepository;
-        this.userRepository = userRepository;
+        this.watcherRepository = watcherRepository;
     }
 
     void process(long id, WatcherDto dto) {
@@ -30,28 +27,17 @@ class TaskAddWatcherCommand {
     }
 
     private void update(TaskDomainModel taskDomainModel, WatcherDto dto) {
-        User entity2 = findUserBy(dto.getId());
-
-        WatcherDomainModel.Builder watcher = watcher(entity2.getUserName().getFirstName(), entity2.getUserName().getLastName());
-
-        if (entity2.getEmailAddress() != null) {
-            watcher.withEmailAddress(entity2.getEmailAddress().getEmailAddress());
-        }
-
-        if (entity2.getPhoneNumber() != null) {
-            watcher.withPhoneNumber(entity2.getPhoneNumber().getNumber(), entity2.getPhoneNumber().getPrefix());
-        }
-
+        WatcherDomainModel watcher = findUserBy(dto.getId());
         taskDomainModel.addWatcher(watcher);
 
         taskRepository.update(taskDomainModel);
     }
 
-    private User findUserBy(Long id) {
-        Optional<User> found = userRepository.findById(id);
+    private WatcherDomainModel findUserBy(Long watcherId) {
+        Optional<WatcherDomainModel> found = watcherRepository.findById(watcherId);
 
         if (found.isEmpty()) {
-            throw new UserNotFoundException();
+            throw new WatcherDomainModelNotFoundException(watcherId);
         }
 
         return found.get();

@@ -5,6 +5,7 @@ import com.smalaca.acl.StoryDomainModelRepositoryACL;
 import com.smalaca.acl.task.OwnerDomainModelRepositoryACL;
 import com.smalaca.acl.task.StatusChangeServiceACL;
 import com.smalaca.acl.task.TaskDomainModelRepositoryACL;
+import com.smalaca.acl.watcher.WatcherDomainModelRepositoryACL;
 import com.smalaca.taskamanager.dto.AssigneeDto;
 import com.smalaca.taskamanager.dto.StakeholderDto;
 import com.smalaca.taskamanager.dto.TaskDto;
@@ -30,6 +31,7 @@ import com.smalaca.taskmanager.command.owner.OwnerDomainModelNotFoundException;
 import com.smalaca.taskmanager.command.story.StoryDomainModelNotFoundException;
 import com.smalaca.taskmanager.command.task.TaskCommandApi;
 import com.smalaca.taskmanager.command.task.TaskDomainModelDoesNotExistException;
+import com.smalaca.taskmanager.command.watcher.WatcherDomainModelNotFoundException;
 import com.smalaca.taskmanager.query.task.TaskQueryApi;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,11 +65,11 @@ public class TaskController {
         this.teamRepository = teamRepository;
         taskQueryApi = new TaskQueryApi(taskRepository);
         taskCommandApi = new TaskCommandApi(
-                userRepository, taskRepository,
                 new StatusChangeServiceACL(toDoItemService),
                 new TaskDomainModelRepositoryACL(taskRepository),
                 new OwnerDomainModelRepositoryACL(userRepository),
-                new StoryDomainModelRepositoryACL(storyRepository));
+                new StoryDomainModelRepositoryACL(storyRepository),
+                new WatcherDomainModelRepositoryACL(userRepository));
     }
 
     @Transactional
@@ -118,7 +120,7 @@ public class TaskController {
             return ResponseEntity.ok().build();
         } catch (TaskDomainModelDoesNotExistException exception) {
             return ResponseEntity.notFound().build();
-        } catch (UserNotFoundException exception) {
+        } catch (WatcherDomainModelNotFoundException exception) {
             return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
         }
     }
