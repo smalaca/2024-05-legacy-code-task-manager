@@ -1,7 +1,7 @@
 package com.smalaca.acl.story;
 
 import com.smalaca.taskamanager.repository.StoryRepository;
-import com.smalaca.taskmanager.command.story.StoryDomainModelRepository;
+import com.smalaca.taskmanager.command.task.StoryDomainModelRepository;
 
 public class StoryDomainModelRepositoryACL implements StoryDomainModelRepository {
     private final StoryRepository storyRepository;

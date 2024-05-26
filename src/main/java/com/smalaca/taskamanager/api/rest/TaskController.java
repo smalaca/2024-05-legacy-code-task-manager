@@ -29,7 +29,7 @@ import com.smalaca.taskamanager.service.ToDoItemService;
 import com.smalaca.taskmanager.command.task.AddTaskWatcherDto;
 import com.smalaca.taskmanager.command.task.CommandStatus;
 import com.smalaca.taskmanager.command.owner.OwnerDomainModelNotFoundException;
-import com.smalaca.taskmanager.command.story.StoryDomainModelNotFoundException;
+import com.smalaca.taskmanager.command.task.StoryDomainModelNotFoundException;
 import com.smalaca.taskmanager.command.task.TaskCommandApi;
 import com.smalaca.taskmanager.command.task.TaskDomainModelDoesNotExistException;
 import com.smalaca.taskmanager.command.watcher.WatcherDomainModelNotFoundException;

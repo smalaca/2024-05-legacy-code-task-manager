@@ -1,7 +1,6 @@
 package com.smalaca.taskmanager.command.task;
 
 import com.smalaca.taskmanager.command.owner.OwnerDomainModelRepository;
-import com.smalaca.taskmanager.command.story.StoryDomainModelRepository;
 import com.smalaca.taskmanager.command.watcher.WatcherDomainModelRepository;
 
 public class TaskCommandApi {
