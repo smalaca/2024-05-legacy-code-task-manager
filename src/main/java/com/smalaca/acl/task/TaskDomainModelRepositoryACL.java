@@ -59,6 +59,7 @@ public class TaskDomainModelRepositoryACL implements TaskDomainModelRepository {
             Story story = storyRepository.findById(taskReadModel.getStoryId()).get();
             task.setStory(story);
             story.addTask(task);
+            storyRepository.save(story);
         }
 
         return task;

@@ -3,7 +3,6 @@ package com.smalaca.taskmanager.command.task;
 import com.smalaca.taskmanager.command.owner.OwnerDomainModel;
 import com.smalaca.taskmanager.command.owner.OwnerDomainModelNotFoundException;
 import com.smalaca.taskmanager.command.owner.OwnerDomainModelRepository;
-import com.smalaca.taskmanager.command.story.StoryDomainModel;
 import com.smalaca.taskmanager.command.story.StoryDomainModelNotFoundException;
 import com.smalaca.taskmanager.command.story.StoryDomainModelRepository;
 
@@ -36,16 +35,12 @@ class TaskCreateCommand {
         }
 
         if (dto.hasStoryId()) {
-            Optional<StoryDomainModel> found = storyDomainModelRepository.findById(dto.getStoryId());
-
-            if (found.isEmpty()) {
+            if (storyDomainModelRepository.existById(dto.getStoryId())) {
+                task.setStoryId(dto.getStoryId());
+            } else {
                 throw new StoryDomainModelNotFoundException(dto.getStoryId());
             }
 
-            StoryDomainModel story = found.get();
-            task.setStory(story);
-
-            storyDomainModelRepository.save(story);
         }
 
         return taskDomainModelRepository.create(task);

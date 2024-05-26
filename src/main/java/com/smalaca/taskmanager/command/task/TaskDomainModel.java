@@ -5,7 +5,6 @@ import com.smalaca.taskamanager.model.embedded.Watcher;
 import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskmanager.command.owner.OwnerDomainModel;
 import com.smalaca.taskmanager.command.owner.OwnerReadModel;
-import com.smalaca.taskmanager.command.story.StoryDomainModel;
 import com.smalaca.taskmanager.command.watcher.WatcherDomainModel;
 import com.smalaca.taskmanager.command.watcher.WatcherReadModel;
 
@@ -23,7 +22,7 @@ public class TaskDomainModel {
     private String status;
     private OwnerDomainModel owner;
     private final List<WatcherDomainModel> watchers = new ArrayList<>();
-    private StoryDomainModel story;
+    private Long storyId;
 
     public TaskDomainModel(Task task) {
         this.taskId = task.getId();
@@ -113,8 +112,8 @@ public class TaskDomainModel {
         this.owner = owner;
     }
 
-    void setStory(StoryDomainModel story) {
-        this.story = story;
+    void setStoryId(Long storyId) {
+        this.storyId = storyId;
     }
 
     public TaskReadModel asReadModel() {
@@ -122,7 +121,6 @@ public class TaskDomainModel {
         List<WatcherReadModel> watchers = this.watchers.stream()
                 .map(WatcherDomainModel::asReadModel)
                 .collect(toList());
-        Long storyId = story == null ? null : story.getId();
         return new TaskReadModel(taskId, storyId, title, description, status, owner, watchers);
     }
 }

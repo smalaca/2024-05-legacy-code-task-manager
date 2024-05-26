@@ -1,11 +1,7 @@
 package com.smalaca.acl.story;
 
-import com.smalaca.taskamanager.model.entities.Story;
 import com.smalaca.taskamanager.repository.StoryRepository;
-import com.smalaca.taskmanager.command.story.StoryDomainModel;
 import com.smalaca.taskmanager.command.story.StoryDomainModelRepository;
-
-import java.util.Optional;
 
 public class StoryDomainModelRepositoryACL implements StoryDomainModelRepository {
     private final StoryRepository storyRepository;
@@ -15,13 +11,7 @@ public class StoryDomainModelRepositoryACL implements StoryDomainModelRepository
     }
 
     @Override
-    public Optional<StoryDomainModel> findById(Long storyId) {
-        Optional<Story> foundStory = storyRepository.findById(storyId);
-        return foundStory.map(StoryDomainModel::new);
-    }
-
-    @Override
-    public void save(StoryDomainModel story) {
-        storyRepository.save(story.asStory());
+    public boolean existById(Long storyId) {
+        return storyRepository.existsById(storyId);
     }
 }
