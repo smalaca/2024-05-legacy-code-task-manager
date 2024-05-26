@@ -7,6 +7,7 @@ import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 import com.smalaca.taskmanager.command.owner.OwnerDomainModel;
 import com.smalaca.taskmanager.command.story.StoryDomainModel;
+import com.smalaca.taskmanager.command.watcher.WatcherDomainModel;
 
 public class TaskDomainModel {
     private final Task task;
@@ -73,5 +74,9 @@ public class TaskDomainModel {
         Story legacyStory = story.asStory();
         task.setStory(legacyStory);
         legacyStory.addTask(task);
+    }
+
+    void addWatcher(WatcherDomainModel.Builder watcher) {
+        task.addWatcher(watcher.build().toWatcher());
     }
 }
