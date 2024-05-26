@@ -2,12 +2,12 @@ package com.smalaca.acl.task;
 
 import com.smalaca.taskamanager.model.entities.User;
 import com.smalaca.taskamanager.repository.UserRepository;
-import com.smalaca.taskmanager.command.task.OwnerDomainModel;
-import com.smalaca.taskmanager.command.task.OwnerDomainModelRepository;
+import com.smalaca.taskmanager.command.owner.OwnerDomainModel;
+import com.smalaca.taskmanager.command.owner.OwnerDomainModelRepository;
 
 import java.util.Optional;
 
-import static com.smalaca.taskmanager.command.task.OwnerDomainModel.Builder.owner;
+import static com.smalaca.taskmanager.command.owner.OwnerDomainModel.Builder.owner;
 
 public class OwnerDomainModelRepositoryACL implements OwnerDomainModelRepository {
     private final UserRepository userRepository;

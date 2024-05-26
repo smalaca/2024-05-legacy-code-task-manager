@@ -1,5 +1,8 @@
 package com.smalaca.taskmanager.command.task;
 
+import com.smalaca.taskmanager.command.owner.OwnerDomainModel;
+import com.smalaca.taskmanager.command.owner.OwnerDomainModelRepository;
+
 import java.util.Optional;
 
 class TaskUpdateCommand {

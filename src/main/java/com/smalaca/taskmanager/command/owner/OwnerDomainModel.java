@@ -1,4 +1,4 @@
-package com.smalaca.taskmanager.command.task;
+package com.smalaca.taskmanager.command.owner;
 
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.Owner;
@@ -19,7 +19,7 @@ public class OwnerDomainModel {
         this.emailAddress = builder.emailAddress;
     }
 
-    Owner toOwner() {
+    public Owner toOwner() {
         Owner owner = new Owner();
         owner.setLastName(lastName);
         owner.setFirstName(firstName);

@@ -26,7 +26,7 @@ import com.smalaca.taskamanager.repository.TeamRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
 import com.smalaca.taskamanager.service.ToDoItemService;
 import com.smalaca.taskmanager.command.task.CommandStatus;
-import com.smalaca.taskmanager.command.task.OwnerDomainModelNotFoundException;
+import com.smalaca.taskmanager.command.owner.OwnerDomainModelNotFoundException;
 import com.smalaca.taskmanager.command.story.StoryDomainModelNotFoundException;
 import com.smalaca.taskmanager.command.task.TaskCommandApi;
 import com.smalaca.taskmanager.query.task.TaskQueryApi;
