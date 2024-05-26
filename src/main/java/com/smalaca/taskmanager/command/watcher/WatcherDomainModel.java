@@ -1,9 +1,5 @@
 package com.smalaca.taskmanager.command.watcher;
 
-import com.smalaca.taskamanager.model.embedded.EmailAddress;
-import com.smalaca.taskamanager.model.embedded.PhoneNumber;
-import com.smalaca.taskamanager.model.embedded.Watcher;
-
 public class WatcherDomainModel {
     private final String firstName;
     private final String lastName;
@@ -19,30 +15,8 @@ public class WatcherDomainModel {
         this.emailAddress = builder.emailAddress;
     }
 
-    public Watcher toWatcher() {
-        Watcher watcher = new Watcher();
-        watcher.setLastName(lastName);
-        watcher.setFirstName(firstName);
-        if (emailAddress != null) {
-            watcher.setEmailAddress(toEmailAddress());
-        }
-        if (phoneNumber != null) {
-            watcher.setPhoneNumber(toPhoneNumber());
-        }
-        return watcher;
-    }
-
-    private PhoneNumber toPhoneNumber() {
-        PhoneNumber phoneNumber = new PhoneNumber();
-        phoneNumber.setNumber(this.phoneNumber);
-        phoneNumber.setPrefix(this.phonePrefix);
-        return phoneNumber;
-    }
-
-    private EmailAddress toEmailAddress() {
-        EmailAddress emailAddress = new EmailAddress();
-        emailAddress.setEmailAddress(this.emailAddress);
-        return emailAddress;
+    public WatcherReadModel asReadModel() {
+        return new WatcherReadModel(firstName, lastName, phoneNumber, phonePrefix, emailAddress);
     }
 
     public static class Builder {

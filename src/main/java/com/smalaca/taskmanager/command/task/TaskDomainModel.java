@@ -3,6 +3,7 @@ package com.smalaca.taskmanager.command.task;
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.Owner;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
+import com.smalaca.taskamanager.model.embedded.Watcher;
 import com.smalaca.taskamanager.model.entities.Story;
 import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
@@ -10,6 +11,7 @@ import com.smalaca.taskmanager.command.owner.OwnerDomainModel;
 import com.smalaca.taskmanager.command.owner.OwnerReadModel;
 import com.smalaca.taskmanager.command.story.StoryDomainModel;
 import com.smalaca.taskmanager.command.watcher.WatcherDomainModel;
+import com.smalaca.taskmanager.command.watcher.WatcherReadModel;
 
 public class TaskDomainModel {
     private final Task task;
@@ -68,19 +70,36 @@ public class TaskDomainModel {
         }
     }
 
+    void addWatcher(WatcherDomainModel watcher) {
+        task.addWatcher(asWatcher(watcher.asReadModel()));
+    }
+
+    private Watcher asWatcher(WatcherReadModel readModel) {
+        Watcher watcher = new Watcher();
+        watcher.setFirstName(readModel.getFirstName());
+        watcher.setLastName(readModel.getLastName());
+        if (readModel.getEmailAddress() != null) {
+            watcher.setEmailAddress(asEmailAddress(readModel.getEmailAddress()));
+        }
+        if (readModel.getPhoneNumber() != null) {
+            watcher.setPhoneNumber(asPhoneNumber(readModel.getPhonePrefix(), readModel.getPhoneNumber()));
+        }
+        return watcher;
+    }
+
     void setOwner(OwnerDomainModel ownerDomainModel) {
         task.setOwner(asOwner(ownerDomainModel.asReadModel()));
     }
 
-    public Owner asOwner(OwnerReadModel ownerReadModel) {
+    public Owner asOwner(OwnerReadModel readModel) {
         Owner owner = new Owner();
-        owner.setFirstName(ownerReadModel.getFirstName());
-        owner.setLastName(ownerReadModel.getLastName());
-        if (ownerReadModel.getEmailAddress() != null) {
-            owner.setEmailAddress(asEmailAddress(ownerReadModel.getEmailAddress()));
+        owner.setFirstName(readModel.getFirstName());
+        owner.setLastName(readModel.getLastName());
+        if (readModel.getEmailAddress() != null) {
+            owner.setEmailAddress(asEmailAddress(readModel.getEmailAddress()));
         }
-        if (ownerReadModel.getPhoneNumber() != null) {
-            owner.setPhoneNumber(asPhoneNumber(ownerReadModel.getPhonePrefix(), ownerReadModel.getPhoneNumber()));
+        if (readModel.getPhoneNumber() != null) {
+            owner.setPhoneNumber(asPhoneNumber(readModel.getPhonePrefix(), readModel.getPhoneNumber()));
         }
         return owner;
     }
@@ -102,9 +121,5 @@ public class TaskDomainModel {
         Story legacyStory = story.asStory();
         task.setStory(legacyStory);
         legacyStory.addTask(task);
-    }
-
-    void addWatcher(WatcherDomainModel watcher) {
-        task.addWatcher(watcher.toWatcher());
     }
 }
