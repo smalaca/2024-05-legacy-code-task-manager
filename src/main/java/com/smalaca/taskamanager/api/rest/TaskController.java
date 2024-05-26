@@ -48,6 +48,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Optional;
 
 import static com.smalaca.acl.task.TaskDomainModelRepositoryACL.taskDomainModelRepositoryACL;
+import static com.smalaca.taskmanager.command.task.TaskCommandApi.taskCommandApi;
 
 @RestController
 @RequestMapping("/task")
@@ -66,7 +67,7 @@ public class TaskController {
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
         taskQueryApi = new TaskQueryApi(taskRepository);
-        taskCommandApi = new TaskCommandApi(
+        taskCommandApi = taskCommandApi(
                 new StatusChangeServiceACL(toDoItemService),
                 taskDomainModelRepositoryACL(taskRepository, storyRepository),
                 new OwnerDomainModelRepositoryACL(userRepository),

@@ -9,14 +9,24 @@ public class TaskCommandApi {
     private final TaskDeleteCommand taskDeleteCommand;
     private final TaskAddWatcherCommand taskAddWatcherCommand;
 
-    public TaskCommandApi(
+    private TaskCommandApi(
+            TaskCreateCommand taskCreateCommand, TaskUpdateCommand taskUpdateCommand,
+            TaskDeleteCommand taskDeleteCommand, TaskAddWatcherCommand taskAddWatcherCommand) {
+        this.taskCreateCommand = taskCreateCommand;
+        this.taskUpdateCommand = taskUpdateCommand;
+        this.taskDeleteCommand = taskDeleteCommand;
+        this.taskAddWatcherCommand = taskAddWatcherCommand;
+    }
+
+    public static TaskCommandApi taskCommandApi(
             StatusChangeService statusChangeService, TaskDomainModelRepository taskRepository,
             OwnerDomainModelRepository ownerRepository, StoryDomainModelRepository storyRepository,
             WatcherDomainModelRepository watcherRepository) {
-        taskCreateCommand = new TaskCreateCommand(taskRepository, ownerRepository, storyRepository);
-        taskUpdateCommand = new TaskUpdateCommand(taskRepository, ownerRepository, statusChangeService);
-        taskDeleteCommand = new TaskDeleteCommand(taskRepository);
-        taskAddWatcherCommand = new TaskAddWatcherCommand(taskRepository, watcherRepository);
+        return new TaskCommandApi(
+                new TaskCreateCommand(taskRepository, ownerRepository, storyRepository),
+                new TaskUpdateCommand(taskRepository, ownerRepository, statusChangeService),
+                new TaskDeleteCommand(taskRepository),
+                new TaskAddWatcherCommand(taskRepository, watcherRepository));
     }
 
     public Long create(CreateTaskDto createTaskDto) {
