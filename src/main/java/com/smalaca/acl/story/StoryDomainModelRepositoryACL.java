@@ -1,4 +1,4 @@
-package com.smalaca.acl;
+package com.smalaca.acl.story;
 
 import com.smalaca.taskamanager.model.entities.Story;
 import com.smalaca.taskamanager.repository.StoryRepository;

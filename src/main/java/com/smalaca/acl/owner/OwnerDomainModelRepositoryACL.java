@@ -1,4 +1,4 @@
-package com.smalaca.acl.task;
+package com.smalaca.acl.owner;
 
 import com.smalaca.taskamanager.model.entities.User;
 import com.smalaca.taskamanager.repository.UserRepository;

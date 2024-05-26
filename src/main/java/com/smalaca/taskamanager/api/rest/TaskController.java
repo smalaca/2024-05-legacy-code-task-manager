@@ -1,8 +1,8 @@
 package com.smalaca.taskamanager.api.rest;
 
 
-import com.smalaca.acl.StoryDomainModelRepositoryACL;
-import com.smalaca.acl.task.OwnerDomainModelRepositoryACL;
+import com.smalaca.acl.story.StoryDomainModelRepositoryACL;
+import com.smalaca.acl.owner.OwnerDomainModelRepositoryACL;
 import com.smalaca.acl.task.StatusChangeServiceACL;
 import com.smalaca.acl.task.TaskDomainModelRepositoryACL;
 import com.smalaca.acl.watcher.WatcherDomainModelRepositoryACL;
