@@ -1,12 +1,9 @@
 package com.smalaca.taskamanager.processor;
 
-import com.smalaca.taskamanager.events.EpicReadyToPrioritize;
 import com.smalaca.taskamanager.events.StoryApprovedEvent;
 import com.smalaca.taskamanager.events.StoryDoneEvent;
 import com.smalaca.taskamanager.events.TaskApprovedEvent;
 import com.smalaca.taskamanager.events.ToDoItemReleasedEvent;
-import com.smalaca.taskamanager.exception.UnsupportedToDoItemType;
-import com.smalaca.taskamanager.model.entities.Epic;
 import com.smalaca.taskamanager.model.entities.Story;
 import com.smalaca.taskamanager.model.entities.Task;
 import com.smalaca.taskamanager.model.interfaces.ToDoItem;
@@ -21,11 +18,12 @@ import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.DONE;
 
 @Component
 public class ToDoItemProcessor {
-    private final StoryService storyService;
-    private final EventsRegistry eventsRegistry;
-    private final ProjectBacklogService projectBacklogService;
-    private final CommunicationService communicationService;
-    private final SprintBacklogService sprintBacklogService;
+    private StoryService storyService;
+    private EventsRegistry eventsRegistry;
+    private ProjectBacklogService projectBacklogService;
+    private CommunicationService communicationService;
+    private SprintBacklogService sprintBacklogService;
+    private final ToDoItemDefinedProcessor toDoItemDefinedProcessor;
 
     public ToDoItemProcessor(
             StoryService storyService, EventsRegistry eventsRegistry, ProjectBacklogService projectBacklogService,
@@ -35,12 +33,14 @@ public class ToDoItemProcessor {
         this.projectBacklogService = projectBacklogService;
         this.communicationService = communicationService;
         this.sprintBacklogService = sprintBacklogService;
+        toDoItemDefinedProcessor = new ToDoItemDefinedProcessor(
+                projectBacklogService, communicationService, sprintBacklogService, eventsRegistry);
     }
 
     public void processFor(ToDoItem toDoItem) {
         switch (toDoItem.getStatus()) {
             case DEFINED:
-                processDefined(toDoItem);
+                toDoItemDefinedProcessor.extracted(toDoItem);
                 break;
 
             case IN_PROGRESS:
@@ -64,33 +64,9 @@ public class ToDoItemProcessor {
         }
     }
 
-    private void processDefined(ToDoItem toDoItem) {
-        if (toDoItem instanceof Story) {
-            Story story = (Story) toDoItem;
-            if (story.getTasks().isEmpty()) {
-                projectBacklogService.moveToReadyForDevelopment(story, story.getProject());
-            } else {
-                if (!story.isAssigned()) {
-                    communicationService.notifyTeamsAbout(story, story.getProject());
-                }
-            }
-        } else {
-            if (toDoItem instanceof Task) {
-                Task task = (Task) toDoItem;
-                sprintBacklogService.moveToReadyForDevelopment(task, task.getCurrentSprint());
-            } else {
-                if (toDoItem instanceof Epic) {
-                    Epic epic = (Epic) toDoItem;
-                    projectBacklogService.putOnTop(epic);
-                    EpicReadyToPrioritize event = new EpicReadyToPrioritize();
-                    event.setEpicId(epic.getId());
-                    eventsRegistry.publish(event);
-                    communicationService.notify(toDoItem, toDoItem.getProject().getProductOwner());
-                } else {
-                    throw new UnsupportedToDoItemType();
-                }
-            }
-        }
+    @Deprecated
+    void setEventsRegistry(EventsRegistry eventsRegistry) {
+        this.eventsRegistry = eventsRegistry;
     }
 
     private void processInProgress(ToDoItem toDoItem) {

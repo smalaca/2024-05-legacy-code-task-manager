@@ -1,5 +1,6 @@
 package com.smalaca.taskamanager.model.entities;
 
+import com.smalaca.taskamanager.dto.TeamDto;
 import com.smalaca.taskamanager.model.embedded.Codename;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -12,6 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Entity
 public class Team {
@@ -116,5 +119,44 @@ public class Team {
                 .append(codename)
                 .append(description)
                 .toHashCode();
+    }
+
+    public TeamDto asTeamDto() {
+        TeamDto dto = new TeamDto();
+        dto.setId(id);
+        dto.setName(name);
+
+        if (hasCodename()) {
+            dto.setCodenameShort(codename.getShortName());
+            dto.setCodenameFull(codename.getFullName());
+        }
+
+        dto.setDescription(description);
+        dto.setUserIds(getUserIds());
+
+//        TeamDto dto = new TeamDto(this);
+//
+//        TeamDto dto = new TeamDto(...);
+//
+//        TeamDto dto = TeamDto.create(...);
+//
+//        TeamDto dto = new TeamDtoFactory().create(
+//                id, name, codename.getShortName(), codename.getFullName(), description, getUserIds());
+//
+//        TeamDto dto = new TeamDtoBuilder()
+//                .withId(id)
+//                .withName(name)
+//                .with()
+//                .build();
+
+        return dto;
+    }
+
+    private boolean hasCodename() {
+        return codename != null;
+    }
+
+    private List<Long> getUserIds() {
+        return members.stream().map(User::getId).collect(toList());
     }
 }

@@ -10,10 +10,23 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class EventsRegistry {
+    private static boolean test;
     private final ApplicationEventPublisher publisher;
 
     public EventsRegistry(ApplicationEventPublisher publisher) {
         this.publisher = publisher;
+    }
+
+    public static void publishStatic(EpicReadyToPrioritize event) {
+        if (test) {
+            // do nothing
+        } else {
+            // 100K
+        }
+    }
+
+    static void isTest() {
+        test = true;
     }
 
     public void publish(StoryDoneEvent event) {

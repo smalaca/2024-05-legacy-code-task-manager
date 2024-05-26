@@ -142,7 +142,7 @@ class TaskControllerTest {
     @Test
     void shouldNotCreateInCaseOfNotExistingStory() {
         given(storyRepository.existsById(STORY_ID)).willReturn(false);
-        given(storyRepository.findById(STORY_ID)).willReturn(Optional.of(story()));
+        given(storyRepository.findById(STORY_ID)).willReturn(Optional.empty());
         given(userRepository.findById(OWNER_ID)).willReturn(Optional.of(owner()));
 
         ResponseEntity<Long> actual = controller.create(newTaskDto());
