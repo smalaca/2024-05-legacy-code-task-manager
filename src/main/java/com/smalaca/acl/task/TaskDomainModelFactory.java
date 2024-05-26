@@ -7,21 +7,23 @@ import com.smalaca.taskmanager.command.owner.OwnerDomainModel;
 import com.smalaca.taskmanager.command.task.TaskDomainModel;
 import com.smalaca.taskmanager.command.watcher.WatcherDomainModel;
 
-import java.util.List;
-
 import static com.smalaca.taskmanager.command.owner.OwnerDomainModel.Builder.owner;
+import static com.smalaca.taskmanager.command.task.TaskDomainModel.Builder.taskDomainModel;
 import static com.smalaca.taskmanager.command.watcher.WatcherDomainModel.Builder.watcher;
-import static java.util.stream.Collectors.toList;
 
 class TaskDomainModelFactory {
     TaskDomainModel from(Task task) {
         OwnerDomainModel owner = task.getOwner() == null ? null : asOwner(task.getOwner());
-        List<WatcherDomainModel> watchers = task.getWatchers().stream()
-                .map(this::asWatcher)
-                .collect(toList());
+        TaskDomainModel taskDomainModel = taskDomainModel(
+                    task.getId(), task.getTitle(), task.getDescription(), task.getStatus().name())
+                .withOwner(owner)
+                .build();
 
-        return new TaskDomainModel(
-                task.getId(), task.getTitle(), task.getDescription(), task.getStatus().name(), owner, watchers);
+        task.getWatchers().forEach(watcher -> {
+            taskDomainModel.addWatcher(asWatcher(watcher));
+        });
+
+        return taskDomainModel;
     }
 
     private OwnerDomainModel asOwner(Owner owner) {

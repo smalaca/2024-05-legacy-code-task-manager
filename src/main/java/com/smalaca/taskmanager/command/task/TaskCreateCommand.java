@@ -6,6 +6,8 @@ import com.smalaca.taskmanager.command.owner.OwnerDomainModelRepository;
 
 import java.util.Optional;
 
+import static com.smalaca.taskmanager.command.task.TaskDomainModel.Builder.taskDomainModel;
+
 class TaskCreateCommand {
     private final TaskDomainModelRepository taskDomainModelRepository;
     private final OwnerDomainModelRepository ownerDomainModelRepository;
@@ -20,7 +22,7 @@ class TaskCreateCommand {
     }
 
     Long process(CreateTaskDto dto) {
-        TaskDomainModel task = new TaskDomainModel(dto.getTitle(), dto.getDescription(), dto.getStatus());
+        TaskDomainModel.Builder task = taskDomainModel(dto.getTitle(), dto.getDescription(), dto.getStatus());
 
         if (dto.hasOwnerId()) {
             Optional<OwnerDomainModel> found = ownerDomainModelRepository.findById(dto.getOwnerId());
@@ -28,19 +30,18 @@ class TaskCreateCommand {
             if (found.isEmpty()) {
                 throw new OwnerDomainModelNotFoundException(dto.getOwnerId());
             } else {
-                task.setOwner(found.get());
+                task.withOwner(found.get());
             }
         }
 
         if (dto.hasStoryId()) {
             if (storyDomainModelRepository.existById(dto.getStoryId())) {
-                task.setStoryId(dto.getStoryId());
+                task.withStory(dto.getStoryId());
             } else {
                 throw new StoryDomainModelNotFoundException(dto.getStoryId());
             }
-
         }
 
-        return taskDomainModelRepository.create(task);
+        return taskDomainModelRepository.create(task.build());
     }
 }
