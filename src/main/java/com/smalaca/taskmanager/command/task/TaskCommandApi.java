@@ -1,7 +1,6 @@
 package com.smalaca.taskmanager.command.task;
 
 import com.smalaca.taskamanager.dto.WatcherDto;
-import com.smalaca.taskamanager.exception.TaskDoesNotExistException;
 import com.smalaca.taskamanager.exception.UserNotFoundException;
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
@@ -12,8 +11,6 @@ import com.smalaca.taskamanager.repository.TaskRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
 import com.smalaca.taskmanager.command.owner.OwnerDomainModelRepository;
 import com.smalaca.taskmanager.command.story.StoryDomainModelRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import java.util.Optional;
 
@@ -23,6 +20,7 @@ public class TaskCommandApi {
     private final TaskCreateCommand taskCreateCommand;
     private final TaskUpdateCommand taskUpdateCommand;
     private final TaskDeleteCommand taskDeleteCommand;
+    private final TaskAddWatcherCommand taskAddWatcherCommand;
 
     public TaskCommandApi(
             UserRepository userRepository, TaskRepository taskRepository,
@@ -33,6 +31,7 @@ public class TaskCommandApi {
         taskCreateCommand = new TaskCreateCommand(taskDomainModelRepository, ownerDomainModelRepository, storyDomainModelRepository);
         taskUpdateCommand = new TaskUpdateCommand(taskDomainModelRepository, ownerDomainModelRepository, statusChangeService);
         taskDeleteCommand = new TaskDeleteCommand(taskDomainModelRepository);
+        taskAddWatcherCommand = new TaskAddWatcherCommand(taskDomainModelRepository);
     }
 
     public Long create(CreateTaskDto createTaskDto) {
@@ -47,47 +46,36 @@ public class TaskCommandApi {
         return taskDeleteCommand.process(id);
     }
 
-    public ResponseEntity<Void> addWatcher(long id, WatcherDto dto) {
-        try {
-            Task entity1 = findTaskBy(id);
+    public void addWatcher(long id, WatcherDto dto) {
+        Task entity1 = findTaskBy(id);
 
-            try {
-                User entity2 = findUserBy(dto.getId());
-                Watcher entity3 = new Watcher();
-                entity3.setFirstName(entity2.getUserName().getFirstName());
-                entity3.setLastName(entity2.getUserName().getLastName());
+        User entity2 = findUserBy(dto.getId());
+        Watcher entity3 = new Watcher();
+        entity3.setFirstName(entity2.getUserName().getFirstName());
+        entity3.setLastName(entity2.getUserName().getLastName());
 
-                if (entity2.getEmailAddress() != null) {
-                    EmailAddress entity4 = new EmailAddress();
-                    entity4.setEmailAddress(entity2.getEmailAddress().getEmailAddress());
-                    entity3.setEmailAddress(entity4);
-                }
-
-                if (entity2.getPhoneNumber() != null) {
-                    PhoneNumber entity5 = new PhoneNumber();
-                    entity5.setNumber(entity2.getPhoneNumber().getNumber());
-                    entity5.setPrefix(entity2.getPhoneNumber().getPrefix());
-                    entity3.setPhoneNumber(entity5);
-                }
-                entity1.addWatcher(entity3);
-
-                taskRepository.save(entity1);
-
-            } catch (UserNotFoundException exception) {
-                return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
-            }
-
-            return ResponseEntity.ok().build();
-        } catch (TaskDoesNotExistException exception) {
-            return ResponseEntity.notFound().build();
+        if (entity2.getEmailAddress() != null) {
+            EmailAddress entity4 = new EmailAddress();
+            entity4.setEmailAddress(entity2.getEmailAddress().getEmailAddress());
+            entity3.setEmailAddress(entity4);
         }
+
+        if (entity2.getPhoneNumber() != null) {
+            PhoneNumber entity5 = new PhoneNumber();
+            entity5.setNumber(entity2.getPhoneNumber().getNumber());
+            entity5.setPrefix(entity2.getPhoneNumber().getPrefix());
+            entity3.setPhoneNumber(entity5);
+        }
+        entity1.addWatcher(entity3);
+
+        taskRepository.save(entity1);
     }
 
     private Task findTaskBy(long id) {
         Optional<Task> found = taskRepository.findById(id);
 
         if (found.isEmpty()) {
-            throw new TaskDoesNotExistException();
+            throw new TaskDomainModelDoesNotExistException(id);
         }
 
         return found.get();

@@ -29,6 +29,7 @@ import com.smalaca.taskmanager.command.task.CommandStatus;
 import com.smalaca.taskmanager.command.owner.OwnerDomainModelNotFoundException;
 import com.smalaca.taskmanager.command.story.StoryDomainModelNotFoundException;
 import com.smalaca.taskmanager.command.task.TaskCommandApi;
+import com.smalaca.taskmanager.command.task.TaskDomainModelDoesNotExistException;
 import com.smalaca.taskmanager.query.task.TaskQueryApi;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -112,7 +113,14 @@ public class TaskController {
 
     @PutMapping("/{id}/watcher")
     public ResponseEntity<Void> addWatcher(@PathVariable long id, @RequestBody WatcherDto dto) {
-        return taskCommandApi.addWatcher(id, dto);
+        try {
+            taskCommandApi.addWatcher(id, dto);
+            return ResponseEntity.ok().build();
+        } catch (TaskDomainModelDoesNotExistException exception) {
+            return ResponseEntity.notFound().build();
+        } catch (UserNotFoundException exception) {
+            return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+        }
     }
 
     @DeleteMapping("/{taskId}/watcher/{watcherId}")
