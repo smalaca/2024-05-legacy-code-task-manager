@@ -13,7 +13,11 @@ import com.smalaca.taskmanager.command.story.StoryDomainModel;
 import com.smalaca.taskmanager.command.watcher.WatcherDomainModel;
 import com.smalaca.taskmanager.command.watcher.WatcherReadModel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.smalaca.taskmanager.command.owner.OwnerDomainModel.Builder.owner;
+import static com.smalaca.taskmanager.command.watcher.WatcherDomainModel.Builder.watcher;
 
 public class TaskDomainModel {
     private final Task task;
@@ -22,6 +26,7 @@ public class TaskDomainModel {
     private String description;
     private String status;
     private OwnerDomainModel owner;
+    private final List<WatcherDomainModel> watchers = new ArrayList<>();
 
     public TaskDomainModel(Task task) {
         this.task = task;
@@ -32,6 +37,7 @@ public class TaskDomainModel {
         if (task.getOwner() != null) {
             owner = asOwner(task.getOwner());
         }
+        task.getWatchers().forEach(watcher -> watchers.add(asWatcher(watcher)));
     }
 
     private OwnerDomainModel asOwner(Owner owner) {
@@ -43,6 +49,20 @@ public class TaskDomainModel {
 
         if (owner.getEmailAddress() != null) {
             builder.withEmailAddress(owner.getEmailAddress().getEmailAddress());
+        }
+
+        return builder.build();
+    }
+
+    private WatcherDomainModel asWatcher(Watcher watcher) {
+        WatcherDomainModel.Builder builder = watcher(watcher.getFirstName(), watcher.getLastName());
+
+        if (watcher.getPhoneNumber() != null) {
+            builder.withPhoneNumber(watcher.getPhoneNumber().getNumber(), watcher.getPhoneNumber().getPrefix());
+        }
+
+        if (watcher.getEmailAddress() != null) {
+            builder.withEmailAddress(watcher.getEmailAddress().getEmailAddress());
         }
 
         return builder.build();
@@ -91,7 +111,7 @@ public class TaskDomainModel {
     }
 
     void addWatcher(WatcherDomainModel watcher) {
-        task.addWatcher(asWatcher(watcher.asReadModel()));
+        watchers.add(watcher);
     }
 
     void setOwner(OwnerDomainModel owner) {
@@ -112,6 +132,10 @@ public class TaskDomainModel {
         if (owner != null) {
             task.setOwner(asOwner(owner.asReadModel()));
         }
+
+        watchers.forEach(watcher -> {
+            task.addWatcher(asWatcher(watcher.asReadModel()));
+        });
 
         return task;
     }
